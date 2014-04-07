@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ARM Limited 2011-2013. All rights reserved.
+ * Copyright (C) ARM Limited 2011-2014. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 #define SESSION_DATA_H
 
 // This is an informational version only; no compatibility is performed based on this value
-#define CAIMAN_VERSION 17
+#define CAIMAN_VERSION 18
 #define PROTOCOL_DEV   1000	// Differentiates development versions (timestamp) from release versions
 
 #define MAX_EPROBE_CHANNELS     3

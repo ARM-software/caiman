@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ARM Limited 2011-2013. All rights reserved.
+ * Copyright (C) ARM Limited 2011-2014. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,12 @@
 #define THREAD_CREATE(THREAD_ID, THREAD_FUNC) THREAD_ID = CreateThread(NULL, 0, (unsigned long (__stdcall *)(void *))THREAD_FUNC, NULL, 0, NULL)
 #define THREAD_JOIN(THREAD_ID) WaitForSingleObject(THREAD_ID, INFINITE)
 
+#define unlink _unlink
+
 #else
 
 // Linux or DARWIN
+#include <unistd.h>
 #include <pthread.h>
 
 #define tHANDLE    pthread_t
@@ -112,7 +115,7 @@ static void writeData(const char* data, uint32_t length, int type) {
   header[3] = (length >> 16) & 0xff;
   header[4] = (length >> 24) & 0xff;
   sock->send((char*)&header, sizeof(header));
-  sock->send((char*)data, length);
+  sock->send((const char*)data, length);
 }
 
 void handleException() {
@@ -435,6 +438,7 @@ int HOST_CDECL main(int argc, char *argv[]) {
 
   // Set up warnings file
   snprintf(binaryPath, CAIMAN_PATH_MAX, "%swarnings.xml", outputPath);
+  unlink(binaryPath);
   logg->SetWarningFile(binaryPath);
 
   // Create a string representing the path to the binary output file and open it
@@ -480,7 +484,9 @@ int HOST_CDECL main(int argc, char *argv[]) {
   if (!cmdline.local) {
     waitingOnConnection = true;
     logg->logMessage("Waiting on connection...");
-    sock = new OlySocket(cmdline.port);
+    OlyServerSocket server(cmdline.port);
+    sock = new OlySocket(server.acceptConnection());
+    server.closeServerSocket();
     waitingOnConnection = false;
     handleMagicSequence();
   }

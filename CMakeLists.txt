@@ -1,4 +1,4 @@
-# Copyright: 2010-2013 ARM Ltd
+# Copyright: 2010-2014 ARM Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,9 @@
 cmake_minimum_required(VERSION 2.6)
 project(energy_probe)
 
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
 include(pb_config)
+include_directories(${PROJECT_SOURCE_DIR})
 
 # Enable this to support auto-detection of the ARM Energy Probe on Linux. Requires udev support. If your Linux platform does not support udev, such as Red Hat 5, disable this option.
 set(SUPPORT_UDEV 1)
@@ -24,10 +26,6 @@ set(SUPPORT_UDEV 1)
 set(SUPPORT_DAQ ${PB_TARGETING_WINDOWS})
 # Enable this to use dlopen/LoadLibrary to load NI-DAQ API so that the so/dlls are not required. Disable this option if runtime errors occur when using a NI-DAQ
 set(NI_RUNTIME_LINK 1)
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${PROJECT_SOURCE_DIR})
-
-set(CMAKE_BUILD_TYPE "Release")
 
 set(src
   ./DAQmx.cpp
@@ -66,33 +64,38 @@ add_executable(caiman
 
 if (${SUPPORT_DAQ})
   add_definitions("-DSUPPORT_DAQ")
-endif()
+  # DAQ only works in 32-bit mode on Linux
+  if (${PB_TARGETING_UNIX})
+    add_definitions("-m32")
+    set_target_properties(caiman PROPERTIES LINK_FLAGS -m32)
+  endif()
 
-# Always build 32-bit on Linux
-if (${PB_TARGETING_UNIX})
-  add_definitions("-m32")
-  set_target_properties(caiman PROPERTIES LINK_FLAGS -m32)
-endif()
-
-if (${NI_RUNTIME_LINK})
-  add_definitions("-DNI_RUNTIME_LINK")
-else()
-  # Modify these includes if necessary when building caiman with NI-DAQ support but without runtime linking
   if (${PB_TARGETING_WINDOWS})
     include_directories(
-      "C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"
-      "C:\Program Files\National Instruments\NI-DAQmx Base\Include"
-    )
-    set(NIDAQ_LIB
-      "C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\lib\msvc\NIDAQmx.lib"
-      "C:\Program Files\National Instruments\NI-DAQmx Base\Lib\nidaqmxbase.lib"
+      "C:/Program Files/National Instruments/NI-DAQ/DAQmx ANSI C Dev/include"
+      "C:/Program Files/National Instruments/NI-DAQmx Base/Include"
     )
   endif()
   if (${PB_TARGETING_UNIX})
     include_directories(/usr/local/natinst/nidaqmxbase/include)
-    set(NIDAQ_LIB /usr/local/natinst/nidaqmxbase/lib/libnidaqmxbase.so.3.7.0)
+  endif()
+
+  # Modify these includes if necessary when building caiman with NI-DAQ support but without runtime linking
+  if (${NI_RUNTIME_LINK})
+    add_definitions("-DNI_RUNTIME_LINK")
+  else()
+    if (${PB_TARGETING_WINDOWS})
+      set(NIDAQ_LIB
+	"C:/Program Files/National Instruments/NI-DAQ/DAQmx ANSI C Dev/lib/msvc/NIDAQmx.lib"
+	"C:/Program Files/National Instruments/NI-DAQmx Base/Lib/nidaqmxbase.lib"
+	)
+    endif()
+    if (${PB_TARGETING_UNIX})
+      set(NIDAQ_LIB /usr/local/natinst/nidaqmxbase/lib/libnidaqmxbase.so.3.7.0)
+    endif()
   endif()
 endif()
+
 
 if(${PB_TARGETING_WINDOWS})
   target_link_libraries(caiman
