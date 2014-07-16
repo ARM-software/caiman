@@ -74,6 +74,8 @@ if (${SUPPORT_DAQ})
     include_directories(
       "C:/Program Files/National Instruments/NI-DAQ/DAQmx ANSI C Dev/include"
       "C:/Program Files/National Instruments/NI-DAQmx Base/Include"
+      "C:/Program Files (x86)/National Instruments/NI-DAQ/DAQmx ANSI C Dev/include"
+      "C:/Program Files (x86)/National Instruments/NI-DAQmx Base/Include"
     )
   endif()
   if (${PB_TARGETING_UNIX})
@@ -85,9 +87,17 @@ if (${SUPPORT_DAQ})
     add_definitions("-DNI_RUNTIME_LINK")
   else()
     if (${PB_TARGETING_WINDOWS})
-      set(NIDAQ_LIB
-	"C:/Program Files/National Instruments/NI-DAQ/DAQmx ANSI C Dev/lib/msvc/NIDAQmx.lib"
-	"C:/Program Files/National Instruments/NI-DAQmx Base/Lib/nidaqmxbase.lib"
+      find_library(
+	NIDAQ_LIB
+	NIDAQmx.lib
+	"C:/Program Files/National Instruments/NI-DAQ/DAQmx ANSI C Dev/lib/msvc"
+	"C:/Program Files (x86)/National Instruments/NI-DAQ/DAQmx ANSI C Dev/lib/msvc"
+	)
+      find_library(
+	NIDAQBASE_LIB
+	nidaqmxbase.lib
+	"C:/Program Files/National Instruments/NI-DAQmx Base/Lib"
+	"C:/Program Files (x86)/National Instruments/NI-DAQmx Base/Lib"
 	)
     endif()
     if (${PB_TARGETING_UNIX})
@@ -102,6 +112,7 @@ if(${PB_TARGETING_WINDOWS})
     ${PB_WH_LIBS}
     ${PB_SYSLIBS_OVERRIDES}
     ${NIDAQ_LIB}
+    ${NIDAQBASE_LIB}
     ws2_32.lib
     Setupapi.lib
   )

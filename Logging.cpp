@@ -58,9 +58,24 @@ bool Logging::logWarning(const char* warning) {
       }
       mFileCreated = true;
     }
-    util->appendToDisk(mWarningXMLPath, "  <warning text=\"");
-    util->appendToDisk(mWarningXMLPath, warning);
-    util->appendToDisk(mWarningXMLPath, "\"/>\n");
+
+    FILE *fh = fopen(mWarningXMLPath, "a");
+    if (fh == NULL) {
+      return false;
+    }
+
+    fputs("  <warning text=\"", fh);
+    for (; *warning != '\0'; ++warning) {
+      switch (*warning) {
+      case '&': fputs("&amp;", fh); break;
+      case '<': fputs("&lt;", fh); break;
+      default: fputc(*warning, fh); break;
+      }
+    }
+    fputs("\"/>\n", fh);
+
+    fclose(fh);
+
     return true;
   }
 

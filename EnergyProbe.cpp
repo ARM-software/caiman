@@ -166,7 +166,8 @@ void EnergyProbe::stop() {
 
   // Stop the device and do not search for an ACK as it will be mixed with the data
   char c = CMD_STOP;
-  writeAll(&c, 1);
+  int n;
+  WRITE_DEVICE(mStream, &c, 1, n);
 
   CLOSE_DEVICE(mStream);
 }

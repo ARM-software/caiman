@@ -18,7 +18,7 @@
 #define SESSION_DATA_H
 
 // This is an informational version only; no compatibility is performed based on this value
-#define CAIMAN_VERSION 18
+#define CAIMAN_VERSION 19
 #define PROTOCOL_DEV   1000	// Differentiates development versions (timestamp) from release versions
 
 #define MAX_EPROBE_CHANNELS     3

@@ -49,3 +49,6 @@ Streamline is distributed with a pre-built caiman. But if you want to change som
 
 -Data is reporting zero or close to zero values
     Check the connections. If you're using the Energy Probe, make sure the green LED is on.
+
+-caiman-src/EnergyProbe.cpp:27:21: error: libudev.h: No such file or directory
+    Your platform either doesn't support udev or is missing the udev headers. Either install libudev-dev or equivalent otherwise disable udev support by setting SUPPORT_UDEV to 0 in CMakeLists.txt
