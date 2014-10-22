@@ -405,14 +405,14 @@ void EnergyProbe::enableChannels() {
 
 inline void EnergyProbe::autoDetectDevice_OS(char *comport, int buffersize) {
   HDEVINFO devInfo = SetupDiGetClassDevs(NULL, "USB", NULL, DIGCF_ALLCLASSES | DIGCF_PRESENT);
-  if(devInfo == INVALID_HANDLE_VALUE) {
+  if (devInfo == INVALID_HANDLE_VALUE) {
     logg->logError(__FILE__, __LINE__, "Detection of COM port failed, please verify the device is attached or specify the COM port on the command line to override auto detection");
     handleException();
   }
 
   SP_DEVINFO_DATA spDevInfoData;
   spDevInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
-  for(int index = 0; SetupDiEnumDeviceInfo(devInfo, index, &spDevInfoData); index++) {
+  for (int index = 0; SetupDiEnumDeviceInfo(devInfo, index, &spDevInfoData); index++) {
     int size = 0;
     char buf[MAX_PATH];
 

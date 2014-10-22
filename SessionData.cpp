@@ -70,7 +70,7 @@ void SessionData::compileData() {
 
       // Determine sources
       // Source always in the following order, as per energy meter device:
-      //		ch0 pwr, ch0 volt, ch0 curr, ch1 pwr, ch1 volt, ch1 curr, ch2 pwr, etc.
+      // ch0 pwr, ch0 volt, ch0 curr, ch1 pwr, ch1 volt, ch1 curr, ch2 pwr, etc.
       mCounterSource[index] = 3*channelsConfigured + field_source[field];
       if (mCounterField[index] == POWER || mCounterField[index] == CURRENT) {
 	mSourceScaleFactor[mCounterSource[index]] = 100 / (float)mResistors[channel];

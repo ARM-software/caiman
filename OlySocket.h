@@ -19,6 +19,12 @@
 
 #include <stddef.h>
 
+#ifdef WIN32
+typedef int socklen_t;
+#else
+#include <sys/socket.h>
+#endif
+
 class OlySocket {
 public:
 #ifndef WIN32
@@ -59,5 +65,8 @@ private:
 
   void createServerSocket(int port);
 };
+
+int socket_cloexec(int domain, int type, int protocol);
+int accept_cloexec(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 
 #endif //__OLY_SOCKET_H__
