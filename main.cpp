@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ARM Limited 2011-2014. All rights reserved.
+ * Copyright (C) ARM Limited 2011-2015. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -219,7 +219,7 @@ static void streamlineSetup(Device *const device) {
     waitingOnCommand = false;
 
     if (response < 0) {
-      logg->logError(__FILE__, __LINE__, "Unexpected socket disconnect");
+      logg->logError("Unexpected socket disconnect");
       handleException();
     }
 
@@ -228,7 +228,7 @@ static void streamlineSetup(Device *const device) {
 
     // add artificial limit
     if ((length < 0) || length > 1024 * 1024) {
-      logg->logError(__FILE__, __LINE__, "Invalid length received, %d", length);
+      logg->logError("Invalid length received, %d", length);
       handleException();
     }
 
@@ -237,14 +237,14 @@ static void streamlineSetup(Device *const device) {
       // allocate memory to contain the data
       data = (char*)calloc(length + 1, 1);
       if (data == NULL) {
-	logg->logError(__FILE__, __LINE__, "Unable to allocate memory for xml");
+	logg->logError("Unable to allocate memory for xml");
 	handleException();
       }
 
       // receive data
       response = sock->receiveNBytes(data, length);
       if (response < 0) {
-	logg->logError(__FILE__, __LINE__, "Unexpected socket disconnect");
+	logg->logError("Unexpected socket disconnect");
 	handleException();
       }
 
@@ -256,31 +256,31 @@ static void streamlineSetup(Device *const device) {
     switch (type) {
     case COMMAND_REQUEST_XML: {
       // Assume this is a request for captured XML
-      int length;
-      char * xml = device->getXML(&length);
-      writeData(xml, length, RESPONSE_XML);
+      int xmlLength;
+      char * xml = device->getXML(&xmlLength);
+      writeData(xml, xmlLength, RESPONSE_XML);
       free(xml);
       break;
     }
     case COMMAND_DELIVER_XML:
-      logg->logError(__FILE__, __LINE__, "Deliver XML command not supported");
+      logg->logError("Deliver XML command not supported");
       handleException();
     case COMMAND_APC_START:
       logg->logMessage("Received apc start request");
       ready = true;
       break;
     case COMMAND_APC_STOP:
-      logg->logError(__FILE__, __LINE__, "Received apc stop request before apc start request");
+      logg->logError("Received apc stop request before apc start request");
       handleException();
       break;
     case COMMAND_DISCONNECT:
       // Clear error log so no text appears on console and exit
       logg->logMessage("Received disconnect command");
-      logg->logError(__FILE__, __LINE__, "");
+      logg->logError("");
       handleException();
       break;
     default:
-      logg->logError(__FILE__, __LINE__, "Unknown command type, %d", type);
+      logg->logError("Unknown command type, %d", type);
       handleException();
     }
 
@@ -295,7 +295,7 @@ static void handleMagicSequence() {
   // Receive magic sequence - can wait forever
   while (strcmp("STREAMLINE", streamline) != 0) {
     if (sock->receiveString(streamline, sizeof(streamline)) == -1) {
-      logg->logError(__FILE__, __LINE__, "Socket disconnected");
+      logg->logError("Socket disconnected");
       handleException();
     }
   }
@@ -316,8 +316,7 @@ static void handleMagicSequence() {
 #endif
 
 static void printHelp(const char* const msg, const char* const version_string) {
-  logg->logError(__FILE__, __LINE__,
-		 "%s"
+  logg->logError("%s"
 		 "%s\n"
 		 "At least one channel must be specified, all other parameters are optional:\n"
 		 "outputpath\tpath to store the apc data; default is current dir\n"
@@ -351,28 +350,28 @@ static struct cmdline_t parseCommandLine(int argc, char** argv) {
     if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-?") == 0 || strcmp(argv[i], "--help") == 0) {
       printHelp("", version_string);
     } else if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--version") == 0) {
-      logg->logError(__FILE__, __LINE__, version_string);
+      logg->logError("%s", version_string);
       handleException();
     } else if (strcmp(argv[i], "-r") == 0) {
       if (++i == argc) {
-	logg->logError(__FILE__, __LINE__, "No value provided on command line after -r option");
+	logg->logError("No value provided on command line after -r option");
 	handleException();
       }
       char * endptr;
       const long channel = strtol(argv[i], &endptr, 10);
       if (*endptr != ':') {
-	logg->logError(__FILE__, __LINE__, "Value provided to -r is malformed");
+	logg->logError("Value provided to -r is malformed");
 	handleException();
       }
       const long value = strtol(endptr + 1, &endptr, 10);
       if ((*endptr != '\0') || (channel < 0) || (channel >= MAX_CHANNELS) || (value <= 0)) {
-	logg->logError(__FILE__, __LINE__, "Value provided to -r is malformed");
+	logg->logError("Value provided to -r is malformed");
 	handleException();
       }
       gSessionData.mResistors[channel] = value;
     } else if (strcmp(argv[i], "-p") == 0) {
       if (++i == argc) {
-	logg->logError(__FILE__, __LINE__, "No port number provided on command line after -p option");
+	logg->logError("No port number provided on command line after -p option");
 	handleException();
       }
       cmdline.port = strtol(argv[i], NULL, 10);
@@ -380,7 +379,7 @@ static struct cmdline_t parseCommandLine(int argc, char** argv) {
       cmdline.local = true;
     } else if (strcmp(argv[i], "-d") == 0) {
       if (++i == argc) {
-	logg->logError(__FILE__, __LINE__, "No device name provided on command line after -d option");
+	logg->logError("No device name provided on command line after -d option");
 	handleException();
       }
       cmdline.device = argv[i];
@@ -388,7 +387,7 @@ static struct cmdline_t parseCommandLine(int argc, char** argv) {
 #if defined(SUPPORT_DAQ)
       cmdline.isdaq = true;
 #else
-      logg->logError(__FILE__, __LINE__, "The --daq option is not supported in this build of caiman.");
+      logg->logError("The --daq option is not supported in this build of caiman.");
       handleException();
 #endif
     } else if (strcmp(argv[i], "--no-print-messages") == 0) {
@@ -445,19 +444,19 @@ int HOST_CDECL main(int argc, char *argv[]) {
   snprintf(binaryPath, CAIMAN_PATH_MAX, "%s0000000000", outputPath);
   if (cmdline.local) {
     if ((binfile = fopen(binaryPath, "wb")) == 0) {
-      logg->logError(__FILE__, __LINE__, "Unable to open output file: %s0000000000\nPlease check write permissions on this file.", outputPath);
+      logg->logError("Unable to open output file: %s0000000000\nPlease check write permissions on this file.", outputPath);
       handleException();
     }
   } else {
     if (sem_init(&senderSem, 0, 0) ||
 	sem_init(&senderThreadStarted, 0, 0)) {
-      logg->logError(__FILE__, __LINE__, "sem_init() failed");
+      logg->logError("sem_init() failed");
       handleException();
     }
     fifo = new Fifo(1<<15, 1<<20, &senderSem);
     THREAD_CREATE(senderThreadID, senderThread);
     if (!senderThreadID) {
-      logg->logError(__FILE__, __LINE__, "Failed to create sender thread");
+      logg->logError("Failed to create sender thread");
       handleException();
     }
   }
@@ -471,7 +470,7 @@ int HOST_CDECL main(int argc, char *argv[]) {
     device = new NiDaq(outputPath, binfile, fifo);
 #else
     // Intentionally redundant: CLI blocks isdaq if !SUPPORT_DAQ
-    logg->logError(__FILE__, __LINE__, "National Instruments DAQ is not supported in this build.");
+    logg->logError("National Instruments DAQ is not supported in this build.");
     handleException();
 #endif
   } else {
@@ -498,7 +497,7 @@ int HOST_CDECL main(int argc, char *argv[]) {
     // Create stop thread
     THREAD_CREATE(stopThreadID, stopThread);
     if (!stopThreadID) {
-      logg->logError(__FILE__, __LINE__, "Failed to create stop thread");
+      logg->logError("Failed to create stop thread");
       handleException();
     }
 

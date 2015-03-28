@@ -1,4 +1,4 @@
-# Copyright: 2010-2014 ARM Ltd
+# Copyright: 2010-2015 ARM Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ set(src
 set_source_files_properties(${src} PROPERTIES LANGUAGE CXX)
 if (${PB_TARGETING_UNIX})
   add_definitions("-pthread")
+  add_definitions("-Wall -Wextra -Wshadow")
   if ($(CMAKE_HOST_APPLE))
     add_definitions("-DDARWIN")
   else() # linux

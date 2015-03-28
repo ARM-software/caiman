@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ARM Limited 2013-2014. All rights reserved.
+ * Copyright (C) ARM Limited 2013-2015. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ void DAQmxFuncs::handleError(const char *id) {
     snprintf(&buf[len], want, " (DAQmx code %d, in '%s.')", (int)m_lastStatus, id);
   }
 
-  logg->logError(__FILE__, __LINE__, buf);
+  logg->logError(buf);
   handleException();
 }
 
@@ -45,7 +45,7 @@ void DAQmxFuncs::handleFriendlyError(const char *msg) {
   char buf[BUFLEN];
   buf[BUFLEN-1] = 0;
   snprintf(buf, BUFLEN, "%s (DAQmx code %d)", msg, (int)m_lastStatus);
-  logg->logError(__FILE__, __LINE__, buf);
+  logg->logError(buf);
   handleException();
 }
 
@@ -62,11 +62,12 @@ DAQmxFuncs * DAQmxFuncs::getInstance() {
     return daqMxBase;
   }
 
-  logg->logError(__FILE__, __LINE__,
+  const char *const msg =
 #ifdef NI_DAQMX_SUPPORT
-		 "NI-DAQmx or "
+    "NI-DAQmx or "
 #endif
-		 "NI-DAQmx Base from National Instruments must be installed for caiman to communicate with the DAQ");
+    "NI-DAQmx Base from National Instruments must be installed for caiman to communicate with the DAQ";
+  logg->logError("%s", msg);
   handleException();
 
   return NULL;

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ARM Limited 2010-2014. All rights reserved.
+ * Copyright (C) ARM Limited 2010-2015. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,15 +30,18 @@ class Logging {
 public:
   Logging(bool debug);
   ~Logging();
-  void logError(const char* file, int line, const char* fmt, ...);
-  void logMessage(const char* fmt, ...);
-  bool logWarning(const char* warning);
+#define logError(...) _logError(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
+  void _logError(const char *function, const char *file, int line, const char* fmt, ...);
+#define logMessage(...) _logMessage(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
+  void _logMessage(const char *function, const char *file, int line, const char* fmt, ...);
   void SetWarningFile(const char* path) {strncpy(mWarningXMLPath, path, CAIMAN_PATH_MAX); mWarningXMLPath[CAIMAN_PATH_MAX - 1] = 0;}
   const char* getLastError() {return mErrBuf;}
   const char* getLastMessage() {return mLogBuf;}
   void setPrintMessages(const bool printMessages) { mPrintMessages = printMessages; }
 
 private:
+  bool logWarning(const char* warning);
+
   char mWarningXMLPath[CAIMAN_PATH_MAX];
   char mErrBuf[4096]; // Arbitrarily large buffer to hold a string
   char mLogBuf[4096]; // Arbitrarily large buffer to hold a string

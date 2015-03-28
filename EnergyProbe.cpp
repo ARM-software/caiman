@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ARM Limited 2011-2014. All rights reserved.
+ * Copyright (C) ARM Limited 2011-2015. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,20 +99,20 @@ void EnergyProbe::init(const char *devicename) {
   char command[80];
   snprintf(command, sizeof(command) - 1, "stty -F %s raw", mComport);
   if (system(command) != 0) {
-    logg->logError(__FILE__, __LINE__, "Unable to set %s to raw mode, please verify the device exists", mComport);
+    logg->logError("Unable to set %s to raw mode, please verify the device exists", mComport);
     handleException();
   }
 #endif
 
   if (mComport == NULL || *mComport == 0) {
-    logg->logError(__FILE__, __LINE__, "Unable to detect the energy probe. Verify that it is attached to the computer and properly enumerated with the OS. If it is enumerated, you can override auto-detection by specifying the 'Device' in the options dialog.");
+    logg->logError("Unable to detect the energy probe. Verify that it is attached to the computer and properly enumerated with the OS. If it is enumerated, you can override auto-detection by specifying the 'Device' in the options dialog.");
     handleException();
   }
 
   // Make connection to the energy metering device
   mStream = OPEN_DEVICE(mComport);
   if (mStream == INVALID_HANDLE_VALUE) {
-    logg->logError(__FILE__, __LINE__, "Unable to open the energy probe at %s - consider overriding auto-detection by specifying the 'Device' in the options dialog.", mComport);
+    logg->logError("Unable to open the energy probe at %s - consider overriding auto-detection by specifying the 'Device' in the options dialog.", mComport);
     handleException();
   }
 
@@ -126,7 +126,7 @@ void EnergyProbe::init(const char *devicename) {
   logg->logMessage("energy probe version is %d", version);
   if (version != ENERGY_PROBE_VERSION) {
     // Version mismatch
-    logg->logError(__FILE__, __LINE__, "energy probe version '%d' is different than the supported version '%d'.\n>> Please upgrade the caiman app and energy probe firmware to the latest versions.", version, ENERGY_PROBE_VERSION);
+    logg->logError("energy probe version '%d' is different than the supported version '%d'.\n>> Please upgrade the caiman app and energy probe firmware to the latest versions.", version, ENERGY_PROBE_VERSION);
     handleException();
   }
 
@@ -142,7 +142,7 @@ void EnergyProbe::init(const char *devicename) {
   readAll((char*)&sampleRate, 4);
   logg->logMessage("energy probe sample rate is %d", sampleRate);
   if (sampleRate != mSampleRate) {
-    logg->logError(__FILE__, __LINE__, "Unexpected sample rate %i, expected %i\n", sampleRate, mSampleRate);
+    logg->logError("Unexpected sample rate %i, expected %i\n", sampleRate, mSampleRate);
     handleException();
   }
 
@@ -170,6 +170,9 @@ void EnergyProbe::stop() {
   WRITE_DEVICE(mStream, &c, 1, n);
 
   CLOSE_DEVICE(mStream);
+
+  // Silence variable ‘n’ set but not used warning
+  (void)n;
 }
 
 void EnergyProbe::processBuffer() {
@@ -269,7 +272,7 @@ int EnergyProbe::readAll(char *ptr, size_t size) {
   int remain = size, n;
   while (!gQuit && remain > 0) {
     if (!READ_DEVICE(mStream, ptr, remain, n)) {
-      logg->logError(__FILE__, __LINE__, "Error reading from the energy probe; data will be incomplete");
+      logg->logError("Error reading from the energy probe; data will be incomplete");
       handleException();
     }
     remain -= n;
@@ -291,7 +294,7 @@ void EnergyProbe::readAck() {
     } else if (ack == RESP_ACK) {
       found = true;
     } else {
-      logg->logError(__FILE__, __LINE__, "Expected an ack from device but received %02x", ack);
+      logg->logError("Expected an ack from device but received %02x", ack);
       handleException();
     }
   }
@@ -314,7 +317,7 @@ int EnergyProbe::writeAll(char *ptr, size_t size) {
 
   while (!gQuit && remain > 0) {
     if (!WRITE_DEVICE(mStream, ptr, remain, n)) {
-      logg->logError(__FILE__, __LINE__, "Write failure when communicating with the energy probe");
+      logg->logError("Write failure when communicating with the energy probe");
       handleException();
     }
     remain -= n;
@@ -362,8 +365,7 @@ void EnergyProbe::prepareChannels() {
   // Energy Probe supports fewer channels than are permitted in configuration
   // Check user hasn't over-configured.
   if (gSessionData.mMaxEnabledChannel >= MAX_EPROBE_CHANNELS) {
-    logg->logError(__FILE__, __LINE__,
-		   "Incorrect configuration: channel %d is configured, but ARM Energy Probe supports ch0-ch%d.",
+    logg->logError("Incorrect configuration: channel %d is configured, but ARM Energy Probe supports ch0-ch%d.",
 		   gSessionData.mMaxEnabledChannel, MAX_EPROBE_CHANNELS-1);
     handleException();
   }
@@ -406,7 +408,7 @@ void EnergyProbe::enableChannels() {
 inline void EnergyProbe::autoDetectDevice_OS(char *comport, int buffersize) {
   HDEVINFO devInfo = SetupDiGetClassDevs(NULL, "USB", NULL, DIGCF_ALLCLASSES | DIGCF_PRESENT);
   if (devInfo == INVALID_HANDLE_VALUE) {
-    logg->logError(__FILE__, __LINE__, "Detection of COM port failed, please verify the device is attached or specify the COM port on the command line to override auto detection");
+    logg->logError("Detection of COM port failed, please verify the device is attached or specify the COM port on the command line to override auto detection");
     handleException();
   }
 
@@ -431,7 +433,7 @@ inline void EnergyProbe::autoDetectDevice_OS(char *comport, int buffersize) {
     int data;
     if (SetupDiGetDeviceRegistryProperty(devInfo, &spDevInfoData, SPDRP_FRIENDLYNAME, (PDWORD)&data, (PBYTE)comport, buffersize, (PDWORD)&buffersize) == 0) {
       SetupDiDestroyDeviceInfoList(devInfo);
-      logg->logError(__FILE__, __LINE__, "Property listing of device failed, please verify the device is attached or specify the COM port on the command line to override auto detection");
+      logg->logError("Property listing of device failed, please verify the device is attached or specify the COM port on the command line to override auto detection");
       handleException();
     }
 
@@ -520,7 +522,7 @@ inline void EnergyProbe::autoDetectDevice_OS(char *comport, int buffersize) {
       (udev_unref_ptr = (udev_unref_func)load_symbol(udev_handle, "udev_unref")) == NULL ||
       false)
     {
-      logg->logError(__FILE__, __LINE__, "Please specify the tty device with -d. E.g. -d /dev/ttyACM0.");
+      logg->logError("Please specify the tty device with -d. E.g. -d /dev/ttyACM0.");
       handleException();
     }
 #endif
@@ -528,7 +530,7 @@ inline void EnergyProbe::autoDetectDevice_OS(char *comport, int buffersize) {
   // initialize udev
   udev = udev_new();
   if (!udev) {
-    logg->logError(__FILE__, __LINE__, "Accessing the udev library failed, please verify the device is attached or specify the tty device on the command line to override auto detection");
+    logg->logError("Accessing the udev library failed, please verify the device is attached or specify the tty device on the command line to override auto detection");
     handleException();
   }
 
@@ -569,7 +571,7 @@ inline void EnergyProbe::autoDetectDevice_OS(char *comport, int buffersize) {
   udev_unref(udev);
 
   if (device_found == false) {
-    logg->logError(__FILE__, __LINE__, "Device could not be found, please verify the device is attached or specify the tty device on the command line to override auto detection");
+    logg->logError("Device could not be found, please verify the device is attached or specify the tty device on the command line to override auto detection");
     handleException();
   }
 }
@@ -579,14 +581,14 @@ inline void EnergyProbe::autoDetectDevice_OS(char *comport, int buffersize) {
 inline void EnergyProbe::autoDetectDevice_OS(char *comport, int buffersize) {
   (void)comport;
   (void)buffersize;
-  logg->logError(__FILE__, __LINE__, "Please specify the tty device with -d. E.g. -d /dev/ttyACM0.");
+  logg->logError("Please specify the tty device with -d. E.g. -d /dev/ttyACM0.");
   handleException();
 }
 
 #elif defined(DARWIN)
 
 inline void EnergyProbe::autoDetectDevice_OS(char *comport, int buffersize) {
-  logg->logError(__FILE__, __LINE__, "On OSX, please specify the tty device with -d. E.g. -d /dev/cu.usbmodem411");
+  logg->logError("On OSX, please specify the tty device with -d. E.g. -d /dev/cu.usbmodem411");
   handleException();
 }
 

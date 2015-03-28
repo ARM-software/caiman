@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ARM Limited 2011-2014. All rights reserved.
+ * Copyright (C) ARM Limited 2011-2015. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ void SessionData::compileData() {
   }
 
   if (mMaxEnabledChannel < 0) {
-    logg->logError(__FILE__, __LINE__, "No channels enabled, please ensure resistance values are set");
+    logg->logError("No channels enabled, please ensure resistance values are set");
     handleException();
   }
 

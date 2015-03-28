@@ -31,6 +31,8 @@ If you're having problems running caiman from Streamline, run it on the command 
 *** Building ***
 Streamline is distributed with a pre-built caiman. But if you want to change some options or the pre-built caiman is insufficient, caiman can be built from source. Caiman uses CMake (http://www.cmake.org) so that both Visual Studio and Makefiles can be generated from the same configuration. After extracting the source, open CMakeLists.txt and modify the settings at the top as desired and, if necessary, modify include_directories and target_link_libraries to add other dependencies, like NI-DAQ. After the CMakeLists.txt file is customized, use CMake to generate either a Makefile or a Visual Studio project, then the project can be built normally.
 
+When building on Windows, if NI-DAQ is enabled, both NI-DAQmx and NI-DAQmx Base need to be installed.
+
 *** Troubleshooting ***
 -Unable to detect the energy probe
     Disconnect and reconnect the energy probe to resolve the issue and ensure the energy probe properly enumerates with the OS. This can occur on some operating systems that do not properly re-enumerate the energy probe device after rebooting or going into sleep/hibernate.

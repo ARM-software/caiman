@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ARM Limited 2013-2014. All rights reserved.
+ * Copyright (C) ARM Limited 2013-2015. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,7 @@ DLLHANDLE load_dll(const char *name) {
 #endif
 
   if (handle == NULL) {
-    char str[80];
-    snprintf(str, 80, "Couldn't find shared library '%s'", name);
-    logg->logMessage(str);
+    logg->logMessage("Couldn't find shared library '%s'", name);
   }
 
   return handle;  // NULL on failure
@@ -52,9 +50,7 @@ void * load_symbol(DLLHANDLE handle, const char *name) {
 #endif
 
   if (symbol == NULL) {
-    char str[80];
-    snprintf(str, 80, "Couldn't find symbol '%s'", name);
-    logg->logMessage(str);
+    logg->logMessage("Couldn't find symbol '%s'", name);
   }
 
   return symbol;

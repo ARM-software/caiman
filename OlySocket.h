@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ARM Limited 2010-2014. All rights reserved.
+ * Copyright (C) ARM Limited 2010-2015. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ typedef int socklen_t;
 class OlySocket {
 public:
 #ifndef WIN32
-  static int connect(const char* path, const size_t pathSize);
+  static int connect(const char* path, const size_t pathSize, const bool calculateAddrlen = false);
 #endif
 
   OlySocket(int socketID);
@@ -51,7 +51,7 @@ class OlyServerSocket {
 public:
   OlyServerSocket(int port);
 #ifndef WIN32
-  OlyServerSocket(const char* path, const size_t pathSize);
+  OlyServerSocket(const char* path, const size_t pathSize, const bool calculateAddrlen = false);
 #endif
   ~OlyServerSocket();
 

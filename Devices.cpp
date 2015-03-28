@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ARM Limited 2011-2014. All rights reserved.
+ * Copyright (C) ARM Limited 2011-2015. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ void Device::writeXML() const {
 
   snprintf(filename, CAIMAN_PATH_MAX, "%scaptured.xml", mOutputPath);
   if ((xmlout = fopen(filename, "wt")) == NULL) {
-    logg->logError(__FILE__, __LINE__, "Unable to create %s", filename);
+    logg->logError("Unable to create %s", filename);
     handleException();
   }
 
@@ -72,7 +72,7 @@ void Device::writeXML() const {
 void Device::writeData(void *buf, size_t size) {
   if (mBinfile != NULL) {
     if (fwrite(buf, 1, size, mBinfile) != size) {
-      logg->logError(__FILE__, __LINE__, "Error writing .apc energy data");
+      logg->logError("Error writing .apc energy data");
       handleException();
     }
   } else {

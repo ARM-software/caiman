@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ARM Limited 2011-2014. All rights reserved.
+ * Copyright (C) ARM Limited 2011-2015. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,13 +156,13 @@ void NiDaq::processBuffer() {
 void NiDaq::lookup_daq() {
   mDev[0] = '\0';
   if (!mDaqMx->getSysDevNames(mDev, MAX_DEVICE_LEN)) {
-    logg->logError(__FILE__, __LINE__, "Auto discovery of DAQ device name is not supported. "
+    logg->logError("Auto discovery of DAQ device name is not supported. "
 		   "Please specify a device with -d.");
     handleException();
   }
 
   if (mDev[0] == '\0') {
-    logg->logError(__FILE__, __LINE__, "Device could not be found, please verify the device is attached or specify a device with -d.");
+    logg->logError("Device could not be found, please verify the device is attached or specify a device with -d.");
     handleException();
   }
 }
