@@ -97,7 +97,7 @@ void EnergyProbe::init(const char *devicename) {
 #ifdef __linux__
   // Set device to raw mode (remove interaction with line discipline)
   char command[80];
-  snprintf(command, sizeof(command) - 1, "stty -F %s raw", mComport);
+  snprintf(command, sizeof(command) - 1, "stty -F %s raw -echo", mComport);
   if (system(command) != 0) {
     logg->logError("Unable to set %s to raw mode, please verify the device exists", mComport);
     handleException();

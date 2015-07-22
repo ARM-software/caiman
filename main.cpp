@@ -310,7 +310,7 @@ static void handleMagicSequence() {
 }
 
 #if defined(SUPPORT_DAQ)
-#define DAQ_HELP "--daq \t\tUse a National Instruments DAQ unit to collect data\n"
+#define DAQ_HELP "--daq \t\tuse a National Instruments DAQ unit to collect data\n"
 #else
 #define DAQ_HELP ""
 #endif

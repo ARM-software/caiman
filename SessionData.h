@@ -18,7 +18,7 @@
 #define SESSION_DATA_H
 
 // This is an informational version only; no compatibility is performed based on this value
-#define CAIMAN_VERSION 21
+#define CAIMAN_VERSION 22
 // Differentiates development versions (timestamp) from release versions
 #define PROTOCOL_DEV 1000
 
