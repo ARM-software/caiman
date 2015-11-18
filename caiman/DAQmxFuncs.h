@@ -29,18 +29,19 @@ public:
 
   virtual ~DAQmxFuncs () {}
 
-  virtual bool cfgSampClkTiming(const char[], double, uint64_t) = 0;
+  virtual bool cfgSampClkTiming(const char arg1[], double arg2, uint64_t arg5) = 0;
   virtual bool clearTask() = 0;
-  virtual bool createAIVoltageChan(const char[], const char[], double, double, const char[]) = 0;
-  virtual bool createTask(const char[]) = 0;
-  virtual bool getDevSerialNum(const char[], unsigned long *) = 0;
-  virtual bool getExtendedErrorInfo(char[], unsigned long) = 0;
-  virtual bool getSysDevNames(char *, unsigned long) = 0;
-  virtual bool readAnalogF64(signed long, double, double[], unsigned long, signed long *, unsigned long *) = 0;
+  virtual bool createAIVoltageChan(const char arg1[], const char arg2[], double arg4, double arg5, const char arg6[]) = 0;
+  virtual bool createTask(const char arg0[]) = 0;
+  virtual bool getDevSerialNum(const char arg0[], uint32_t *arg1) = 0;
+  virtual bool getExtendedErrorInfo(char errorString[], uint32_t bufferSize) = 0;
+  virtual bool getSysDevNames(char * arg1, uint32_t arg2) = 0;
+  virtual bool readAnalogF64(int32_t arg1, double arg2, double arg4[], uint32_t arg5, int32_t *arg6, uint32_t *arg7) = 0;
   virtual bool startTask() = 0;
   virtual bool stopTask() = 0;
 
-  void handleError(const char *id);
+#define handleError(id) _handleError(__FUNCTION__, __FILE__, __LINE__, id)
+  void _handleError(const char *function, const char *file, int line, const char *id);
   void handleFriendlyError(const char *msg);
 
 protected:

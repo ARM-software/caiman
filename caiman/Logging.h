@@ -28,15 +28,16 @@
 
 class Logging {
 public:
-  Logging(bool debug);
+  Logging();
   ~Logging();
+
+  void setDebug(bool debug) { mDebug = debug; }
 #define logError(...) _logError(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
   void _logError(const char *function, const char *file, int line, const char* fmt, ...);
 #define logMessage(...) _logMessage(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
   void _logMessage(const char *function, const char *file, int line, const char* fmt, ...);
   void SetWarningFile(const char* path) {strncpy(mWarningXMLPath, path, CAIMAN_PATH_MAX); mWarningXMLPath[CAIMAN_PATH_MAX - 1] = 0;}
   const char* getLastError() {return mErrBuf;}
-  const char* getLastMessage() {return mLogBuf;}
   void setPrintMessages(const bool printMessages) { mPrintMessages = printMessages; }
 
 private:
@@ -44,7 +45,6 @@ private:
 
   char mWarningXMLPath[CAIMAN_PATH_MAX];
   char mErrBuf[4096]; // Arbitrarily large buffer to hold a string
-  char mLogBuf[4096]; // Arbitrarily large buffer to hold a string
   bool mDebug;
   bool mFileCreated;
 #ifdef WIN32
@@ -55,7 +55,7 @@ private:
   bool mPrintMessages;
 };
 
-extern Logging* logg;
+extern Logging logg;
 
 extern void handleException();
 

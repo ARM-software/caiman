@@ -1,0 +1,287 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en_US" lang="en_US">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <style type="text/css">
+      .circle {
+        -webkit-border-radius: 999px;
+        -moz-border-radius: 999px;
+        border-radius: 999px;
+        border: 1px solid #003366;
+        padding: 2px;
+      }
+      .white {
+        color: white;
+      }
+      table {
+        border-spacing: 0px;
+        border-bottom: 1px solid gray;
+        border-right: 1px solid gray;
+      }
+      th, td {
+        padding: 2px;
+        vertical-align: text-top;
+        border-left: 1px solid gray;
+        border-top: 1px solid gray;
+      }
+      th {
+        background-color: #687684;
+      }
+      table.none {
+        border: 0px;
+      }
+      table.none td {
+        border: 0px;
+      }
+      .literal {
+        font-family: monospace;
+      }
+    </style>
+    <script type="text/javascript" src="../topbar.js"></script>
+    <title>Caiman v23 (DS-5 v5.23) Protocol</title>
+  </head>
+  <body>
+    <div class="master">
+    <h1 id="top">Caiman v23 (DS-5 v5.23) Protocol</h1>
+    <h2 id="Index">Index</h2>
+    <ul>
+      <li>
+	<a href="#Introduction">Introduction</a>
+      </li>
+      <li>
+	<a href="#Protocol">Target-Host Protocol</a>
+	<ul>
+	  <li><a href="#Magic">Magic Exchange</a></li>
+	  <li><a href="#CommandHeader">Command Header</a></li>
+	  <li><a href="#CommandRequestXML">Request XML Body</a></li>
+	  <li><a href="#CommandAPCStart">APC Start Body</a></li>
+	  <li><a href="#CommandAPCStop">APC Stop Body</a></li>
+	  <li><a href="#CommandDisconnect">Disconnect Body</a></li>
+	  <li><a href="#CommandPing">Ping Body</a></li>
+	</ul>
+      </li>
+      <li>
+	<a href="#Response">Response Format</a>
+	<ul>
+	  <li><a href="#ResponseHeader">Response Header</a></li>
+	  <li><a href="#ResponseXML">XML Body</a></li>
+	  <li><a href="#ResponseApcData">APC Data Body</a></li>
+	  <li><a href="#ResponseAck">ACK Body</a></li>
+	  <li><a href="#ResponseNak">NAK Body</a></li>
+	  <li><a href="#ResponseError">Error Body</a></li>
+	</ul>
+      </li>
+      <li>
+	<a href="#XML">XML</a>
+	<ul>
+	  <li><a href="#XMLCaptured">Captured</a></li>
+	</ul>
+      </li>
+    </ul>
+    <h2 id="Introduction">Introduction</h2>
+    <p>This document describes the TCP/IP protocol used by caiman or other implementing clients to communicate with Streamline version 5.23. Use this information to build a customized client to communicate energy data to Streamline. The caiman source code, distributed as part of <a href="http://www.arm.com/products/tools/software-tools/ds-5/index.php">DS-5</a>, is the reference implementation of this protocol. The protocol may change with future releases of Streamline, but Streamline will maintain backwards compatibility with this version of the protocol so that clients need only implement one version of the protocol. Streamline requires that your client is able to parse and generate simple XML and ignore additional or unexpected nodes or attributes. Because the XML features described in this protocol documentation are the only ones used, this protocol does not require the more complex features of XML.</p>
+    <h2 id="Protocol">Target-Host Protocol</h2>
+    <h3 id="Magic">Magic Exchange</h3>
+    <p>A handshake is required so that your client and Streamline can recognize each other. It consists of ASCII newline (\n) delimited strings. If the client receives a string it does not recognize, the string must be discarded and another string is read.</p>
+    <p>The standard Streamline client is caiman. But, as you can customize caiman and call it what you wish, the term client is used generically to refer to your customized protocol.</p>
+    <ol>
+      <li>The client receives Streamline's highest supported protocol version <span class="literal">VERSION $VER\n</span>, for example if Streamline supports up to version 23, the client would receive <span class="literal">VERSION 23\n</span>.</li>
+      <li>The client receives <span class="literal">STREAMLINE\n</span></li>
+      <li>Send <span class="literal">CAIMAN 23\n</span></li>
+    </ol>
+    <p>Further communication from Streamline comes as <a href="#CommandHeader">Commands</a></p>
+    <h3 id="CommandHeader">Command Header</h3>
+    <p>Streamline issues commands that consist of a header and a body. Streamline expects a <a href="#Response">Response</a> to these commands from the client.</p>
+    <p/>
+    <table>
+      <tr>
+	<th><span class="white">Name</span></th>
+	<th><span class="white">Type</span></th>
+	<th><span class="white">Description</span></th>
+      </tr>
+      <tr>
+	<td>Code</td>
+	<td>int8</td>
+	<td>The type of command
+	  <table class="none">
+	    <tr><td>0</td><td>= <a href="#CommandRequestXML">Request XML</a></td></tr>
+            <tr><td>2</td><td>= <a href="#CommandAPCStart">APC Start</a></td></tr>
+            <tr><td>3</td><td>= <a href="#CommandAPCStop">APC Stop</a></td></tr>
+            <tr><td>4</td><td>= <a href="#CommandDisconnect">Disconnect</a></td></tr>
+            <tr><td>5</td><td>= <a href="#CommandPing">Ping</a></td></tr>
+	  </table>
+	</td>
+      </tr>
+      <tr>
+	<td>Length</td>
+	<td>Little Endian int32</td>
+	<td>Number of bytes in the body</td>
+      </tr>
+    </table>
+    <p>If the client receives an unrecognized command, it should respond with a <a href="#ResponseNak">NAK</a>.</p>
+    <h3 id="CommandRequestXML">Request XML Body</h3>
+    <p>Command code 0 is a request from Streamline for XML. The root node is request and it has the type attribute that tells the client which XML is required. For example, this is a request for <a href="#XMLCaptured">Captured XML</a></p>
+    <p class="literal">
+      &lt;?xml version="1.0" encoding="US-ASCII"?&gt;<br/>
+      &lt;request type="captured"&gt;<br/>
+      &lt;/request&gt;
+    </p>
+    <p/>
+    <table>
+      <tr>
+	<th><span class="white">Request</span></th>
+	<th><span class="white">Response Code</span></th>
+	<th><span class="white">Response Body</span></th>
+      </tr>
+      <tr>
+	<td><span class="literal">&lt;request type="captured"&gt;</span></td>
+	<td>XML</td>
+	<td><a href="#XMLCaptured">Captured XML</a> Streamline requests Captured XML prior to starting a capture.</td>
+      </tr>
+    </table>
+    <h3 id="CommandAPCStart">APC Start Body</h3>
+    <p>The APC Start command does not have a body. This command initiates a capture and readies Streamline to receive <a href="#ResponseApcData">APC Data Responses</a>. No ACK is expected and no further XML exchange takes place. If a failure occurs, the client should send an <a href="#ResponseError">Error</a>.</p>
+    <h3 id="CommandAPCStop">APC Stop Body</h3>
+    <p>The APC Stop command also does not have a body. This command triggers the end of the APC and no ACK is expected. <a href="#ResponseApcData">APC Data Responses</a> can continue to arrive until all captured data is sent, then the connection should be closed. If a failure occurs, the client should send an <a href="#ResponseError">Error</a>.</p>
+    <h3 id="CommandDisconnect">Disconnect Body</h3>
+    <p>The Disconnect command, which closes the connection to the target, does not contain a command body. No ACK is expected.</p>
+    <h3 id="CommandPing">Ping Body</h3>
+    <p>The Ping command does not have a body. Send an ACK response to this command.</p>
+    <h2 id="Response">Response Format</h2>
+    <p>Responses consist of a header followed by a body</p>
+    <h3 id="ResponseHeader">Response Header</h3>
+    <p>The format for the response header is identical to that of the <a href="#CommandHeader">Command Header</a> but the Codes are different</p>
+    <p/>
+    <table>
+      <tr>
+	<th><span class="white">Name</span></th>
+	<th><span class="white">Type</span></th>
+	<th><span class="white">Description</span></th>
+      </tr>
+      <tr>
+	<td>Code</td>
+	<td>int8</td>
+	<td>The type of command
+	  <table class="none">
+	    <tr><td>1</td><td>= <a href="#ResponseXML">XML</a></td></tr>
+	    <tr><td>3</td><td>= <a href="#ResponseApcData">APC Data</a></td></tr>
+	    <tr><td>4</td><td>= <a href="#ResponseAck">ACK</a></td></tr>
+	    <tr><td>5</td><td>= <a href="#ResponseNak">NAK</a></td></tr>
+	    <tr><td>0xFF</td><td>= <a href="#ResponseError">Error</a></td></tr>
+	  </table>
+	</td>
+      </tr>
+      <tr>
+	<td>Length</td>
+	<td>Little Endian int32</td>
+	<td>Number of bytes in the body</td>
+      </tr>
+    </table>
+    <h3 id="ResponseXML">XML Body</h3>
+    <p>The body should contain XML, the format of which is dependent on the Request type. For a list of types, see <a href="#CommandRequestXML">Request XML Body</a></p>
+    <h3 id="ResponseApcData">APC Data Body</h3>
+    <p>If the length is zero, it is the End of Sequence message which indicates that all APC data has been transmitted to Streamline. Otherwise it is the sample stream where each sample contains one little-endian value of size bytes for every source as specified in <a href="#XMLCaptured">Captured XML</a>. So a sample consists of size*source bytes. All values are represented in thousandths, i.e. in milli-volts, amps, and watts.</p>
+    <h3 id="ResponseAck">ACK Body</h3>
+    <p>This response, which indicates the <a href="#CommandHeader">Command</a> was successful, does not have a response body.</p>
+    <h3 id="ResponseNak">NAK Body</h3>
+    <p>Indicates a synchronous non-fatal error occurred when handling a request. It can contain a UTF-8 error message. The length is specified in the header, so no NULL character is expected. Indicates that the <a href="#CommandHeader">Command</a> failed, but that the connection can continue.</p>
+    <h3 id="ResponseError">Error Body</h3>
+    <p>Indicates a synchronous fatal error occurred when responding to a request. A UTF-8 error message. The length is specified in the header, so no NULL character is expected. Use this response when the error is terminal and the connection must be closed. Errors may be sent without a request, but Streamline may not process them immediately.</p>
+    <h2 id="XML">XML</h2>
+    <h3 id="XMLCaptured">Captured</h3>
+    <p>Captured XML contains information about a capture session.</p>
+    <p><b>captured</b></p>
+    <p>The captured root node of Captured XML has one target child node, one counters child node, and the following attributes:</p>
+    <p/>
+    <table>
+      <tr>
+	<th><span class="white">Name</span></th>
+	<th><span class="white">Type</span></th>
+	<th><span class="white">Description</span></th>
+      </tr>
+      <tr>
+	<td>version</td>
+	<td>Integer</td>
+	<td><span class="circle">23</span></td>
+      </tr>
+    </table>
+    <p><b>target</b></p>
+    <p>The captured node always contains one target child node. The target child node has the following attributes:</p>
+    <p/>
+    <table>
+      <tr>
+	<th><span class="white">Name</span></th>
+	<th><span class="white">Type</span></th>
+	<th><span class="white">Description</span></th>
+      </tr>
+      <tr>
+	<td>name</td>
+	<td>String</td>
+	<td>The name of the energy capture device</td>
+      </tr>
+      <tr>
+	<td>sample_rate</td>
+	<td>Integer</td>
+	<td>Number of samples collected per second</td>
+      </tr>
+      <tr>
+	<td>sources</td>
+	<td>Integer</td>
+	<td>Number of counters collected per sample</td>
+      </tr>
+      <tr>
+	<td>size</td>
+	<td>Integer</td>
+	<td>Number of bytes per sample source, one of 1, 2 or 4.</td>
+      </tr>
+    </table>
+    <p><b>counters</b></p>
+    <p>The captured node always contains one counters node. The counters node has the following child node:</p>
+    <p><b>counter</b></p>
+    <p>The counters node can contain any number of counter child nodes. The counter child node contains the following attributes:</p>
+    <p/>
+    <table>
+      <tr>
+	<th><span class="white">Name</span></th>
+	<th><span class="white">Type</span></th>
+	<th><span class="white">Description</span></th>
+      </tr>
+      <tr>
+	<td>source</td>
+	<td>Integer</td>
+	<td>Order of this counter in the APC data</td>
+      </tr>
+      <tr>
+	<td>channel</td>
+	<td>Integer</td>
+	<td>Channel this counter corresponds to</td>
+      </tr>
+      <tr>
+	<td>type</td>
+	<td>String</td>
+	<td>One of Power, Voltage or Current</td>
+      </tr>
+      <tr>
+	<td>resistance</td>
+	<td>Integer</td>
+	<td>The resistance that corresponds to the channel</td>
+      </tr>
+    </table>
+    <p>Example:</p>
+    <p class="literal">
+      &lt;?xml version="1.0" encoding='UTF-8'?&gt;<br/>
+      &lt;captured version="23"&gt;<br/>
+      &nbsp;&nbsp;&lt;target name="ARM Streamline Energy Probe" sample_rate="10000" sources="6" size="4"/&gt;<br/>
+      &nbsp;&nbsp;&lt;counters&gt;<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;counter source="0" channel="0" type="Power" resistance="20"/&gt;<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;counter source="2" channel="0" type="Current" resistance="20"/&gt;<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;counter source="1" channel="0" type="Voltage" resistance="20"/&gt;<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;counter source="3" channel="1" type="Power" resistance="20"/&gt;<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;counter source="5" channel="1" type="Current" resistance="20"/&gt;<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;&lt;counter source="4" channel="1" type="Voltage" resistance="20"/&gt;<br/>
+      &nbsp;&nbsp;&lt;/counters&gt;<br/>
+      &lt;/captured&gt;
+    </p>
+    </div>
+  </body>
+</html>

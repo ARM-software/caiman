@@ -27,6 +27,7 @@
 DLLHANDLE load_dll(const char *name) {
   DLLHANDLE handle;
 
+  logg.logMessage("Trying to load '%s'", name);
 #if defined (WIN32)
   handle = LoadLibrary(name);
 #elif defined (__linux__) || defined(DARWIN)
@@ -34,23 +35,24 @@ DLLHANDLE load_dll(const char *name) {
 #endif
 
   if (handle == NULL) {
-    logg->logMessage("Couldn't find shared library '%s'", name);
+    logg.logMessage("Couldn't find shared library '%s'", name);
   }
 
   return handle;  // NULL on failure
 }
 
-void * load_symbol(DLLHANDLE handle, const char *name) {
-  void * symbol;
+void *load_symbol(DLLHANDLE handle, const char *name) {
+  void *symbol;
 
+  logg.logMessage("Trying to find symbol '%s'", name);
 #if defined (WIN32)
-  symbol = GetProcAddress(handle, name);
+  symbol = (void *)GetProcAddress(handle, name);
 #else
   symbol = dlsym(handle, name);
 #endif
 
   if (symbol == NULL) {
-    logg->logMessage("Couldn't find symbol '%s'", name);
+    logg.logMessage("Couldn't find symbol '%s'", name);
   }
 
   return symbol;

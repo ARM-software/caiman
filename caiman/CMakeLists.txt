@@ -19,13 +19,18 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
 include(pb_config)
 include_directories(${PROJECT_SOURCE_DIR})
 
-# Enable this to support auto-detection of the ARM Energy Probe on Linux. Requires udev support. If your Linux platform does not support udev, such as Red Hat 5, disable this option.
-set(SUPPORT_UDEV 1)
-# Enable this to support National Instruments DAQs
-# Currently this is set to only enable NI-DAQ on Windows
-set(SUPPORT_DAQ ${PB_TARGETING_WINDOWS})
-# Enable this to use dlopen/LoadLibrary to load NI-DAQ API so that the so/dlls are not required. Disable this option if runtime errors occur when using a NI-DAQ
-set(NI_RUNTIME_LINK 1)
+if (NOT SUPPORT_UDEV)
+  set(SUPPORT_UDEV 1 CACHE STRING
+    "Enable this to support auto-detection of the ARM Energy Probe on Linux. Requires udev support. If your Linux platform does not support udev, such as Red Hat 5, disable this option.")
+endif(NOT SUPPORT_UDEV)
+if (NOT SUPPORT_DAQ)
+  set(SUPPORT_DAQ ${PB_TARGETING_WINDOWS} CACHE STRING
+    "Enable this to support National Instruments DAQs. By default NI-DAQ is only set on Windows")
+endif(NOT SUPPORT_DAQ)
+if (NOT NI_RUNTIME_LINK)
+  set(NI_RUNTIME_LINK 1 CACHE STRING
+    "Enable this to use dlopen/LoadLibrary to load NI-DAQ API so that the so/dlls are not required. Disable this option if runtime errors occur when using a NI-DAQ")
+endif(NOT NI_RUNTIME_LINK)
 
 set(src
   ./DAQmx.cpp
@@ -41,12 +46,13 @@ set(src
   ./OlySocket.cpp
   ./OlyUtility.cpp
   ./SessionData.cpp
+  ./c++.cpp
 )
 
 set_source_files_properties(${src} PROPERTIES LANGUAGE CXX)
 if (${PB_TARGETING_UNIX})
   add_definitions("-pthread")
-  add_definitions("-Wall -Wextra -Wshadow")
+  add_definitions("-Wall -Wextra -Wshadow -fno-exceptions -fno-rtti")
   if ($(CMAKE_HOST_APPLE))
     add_definitions("-DDARWIN")
   else() # linux
@@ -115,7 +121,7 @@ if(${PB_TARGETING_WINDOWS})
     ${NIDAQ_LIB}
     ${NIDAQBASE_LIB}
     ws2_32.lib
-    Setupapi.lib
+    setupapi.lib
   )
 else()
   target_link_libraries(caiman

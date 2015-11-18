@@ -87,7 +87,7 @@ void SessionData::compileData() {
   }
 
   if (mMaxEnabledChannel < 0) {
-    logg->logError("No channels enabled, please ensure resistance values are set");
+    logg.logError("No channels enabled, please ensure resistance values are set");
     handleException();
   }
 

@@ -24,7 +24,7 @@
 
 // Utility for formatting errors from DAQ dll. Logs
 // the error, so all the caller has to do is propagate error
-void DAQmxFuncs::handleError(const char *id) {
+void DAQmxFuncs::_handleError(const char *function, const char *file, int line, const char *id) {
   static const int BUFLEN=2048;
   char buf[BUFLEN];
   buf[BUFLEN-1] = 0;
@@ -35,7 +35,7 @@ void DAQmxFuncs::handleError(const char *id) {
     snprintf(&buf[len], want, " (DAQmx code %d, in '%s.')", (int)m_lastStatus, id);
   }
 
-  logg->logError(buf);
+  logg._logError(function, file, line, buf);
   handleException();
 }
 
@@ -45,7 +45,7 @@ void DAQmxFuncs::handleFriendlyError(const char *msg) {
   char buf[BUFLEN];
   buf[BUFLEN-1] = 0;
   snprintf(buf, BUFLEN, "%s (DAQmx code %d)", msg, (int)m_lastStatus);
-  logg->logError(buf);
+  logg.logError(buf);
   handleException();
 }
 
@@ -62,12 +62,15 @@ DAQmxFuncs * DAQmxFuncs::getInstance() {
     return daqMxBase;
   }
 
+  const int bitsize = 8*sizeof(void *);
+  const int otherBitsize = bitsize == 32 ? 64 : 32;
   const char *const msg =
+    "Unable to find a %i-bit version of "
 #ifdef NI_DAQMX_SUPPORT
     "NI-DAQmx or "
 #endif
-    "NI-DAQmx Base from National Instruments must be installed for caiman to communicate with the DAQ";
-  logg->logError("%s", msg);
+    "NI-DAQmx Base from National Instruments. If it is already installed, you may need to try the %i-bit version of caiman.";
+  logg.logError(msg, bitsize, otherBitsize);
   handleException();
 
   return NULL;

@@ -15,6 +15,7 @@
  */
 
 #include <stddef.h>
+#include <assert.h>
 
 #include "Dll.h"
 
@@ -54,6 +55,9 @@
 class DAQMX : public DAQmxFuncs {
 public:
   DAQMX () : m_dllsLoaded(false), m_tH(0) {
+    assert(sizeof(uint32_t) == sizeof(uInt32));
+    assert(sizeof(int32_t) == sizeof(int32));
+    assert(sizeof(uint32_t) == sizeof(bool32));
   }
 
   ~DAQMX () {
@@ -79,17 +83,17 @@ public:
     return !DAQmxFailed(m_lastStatus);
   }
 
-  bool getDevSerialNum(const char arg0[], unsigned long *arg1) {
-    m_lastStatus = DAQmxFunc(GetDevSerialNum)(arg0, arg1);
+  bool getDevSerialNum(const char arg0[], uint32_t *arg1) {
+    m_lastStatus = DAQmxFunc(GetDevSerialNum)(arg0, (uInt32 *)arg1);
     return !DAQmxFailed(m_lastStatus);
   }
 
-  bool getExtendedErrorInfo(char errorString[], unsigned long bufferSize) {
+  bool getExtendedErrorInfo(char errorString[], uint32_t bufferSize) {
     m_lastStatus = DAQmxFunc(GetExtendedErrorInfo)(errorString, bufferSize);
     return !DAQmxFailed(m_lastStatus);
   }
 
-  bool getSysDevNames(char * arg1, unsigned long arg2) {
+  bool getSysDevNames(char * arg1, uint32_t arg2) {
 #if defined(NI_RUNTIME_LINK) || defined(NI_DAQMX_SUPPORT)
 #ifdef NI_RUNTIME_LINK
     if (DAQmxFunc(GetSysDevNames) == NULL) {
@@ -103,8 +107,8 @@ public:
 #endif
   }
 
-  bool readAnalogF64(signed long arg1, double arg2, double arg4[], unsigned long arg5, signed long *arg6, unsigned long *arg7) {
-    m_lastStatus = DAQmxFunc(ReadAnalogF64)(m_tH, arg1, arg2, DAQmx_Val_GroupByScanNumber, arg4, arg5, arg6, arg7);
+  bool readAnalogF64(int32_t arg1, double arg2, double arg4[], uint32_t arg5, int32_t *arg6, uint32_t *arg7) {
+    m_lastStatus = DAQmxFunc(ReadAnalogF64)(m_tH, arg1, arg2, DAQmx_Val_GroupByScanNumber, arg4, arg5, (int32 *)arg6, (bool32 *)arg7);
     return !DAQmxFailed(m_lastStatus);
   }
 
@@ -197,7 +201,8 @@ private:
   DAQMX &operator=(const DAQMX &);
 };
 
+static DAQMX daqMx;
+
 DAQmxFuncs * DAQmxFuncs::CAT(get, DAQMX) () {
-  static DAQMX daqMx;
   return &daqMx;
 }

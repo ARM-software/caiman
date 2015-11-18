@@ -95,10 +95,10 @@ static void HOST_CDECL sigintHandler(int sig) {
 
   (void)sig;
   if (beenHere) {
-    logg->logMessage("Caiman is being forced to shut down.");
+    logg.logMessage("Caiman is being forced to shut down.");
     exit(-1);
   }
-  logg->logMessage("Caiman is shutting down.");
+  logg.logMessage("Caiman is shutting down.");
   beenHere = true;
   gQuit = true;
   if (waitingOnConnection) {
@@ -122,14 +122,14 @@ void handleException() {
   static int numExceptions = 0;
   if (numExceptions++ > 0) {
     // it is possible one of the below functions itself can cause an exception, thus allow only one exception
-    logg->logMessage("Received multiple exceptions, terminating caiman");
+    logg.logMessage("Received multiple exceptions, terminating caiman");
     exit(1);
   }
-  fprintf(stderr, "%s", logg->getLastError());
+  fprintf(stderr, "%s", logg.getLastError());
 
   if (sock) {
     // send the error, regardless of the command sent by Streamline
-    writeData(logg->getLastError(), strlen(logg->getLastError()), RESPONSE_ERROR);
+    writeData(logg.getLastError(), strlen(logg.getLastError()), RESPONSE_ERROR);
 
     // cannot close the socket before Streamline issues the command, so wait for the command before exiting
     if (waitingOnCommand) {
@@ -144,13 +144,12 @@ void handleException() {
     fclose(binfile);
   }
 
-  delete logg;
   exit(1);
 }
 
 static void* stopThread(void* pVoid) {
   (void)pVoid;
-  logg->logMessage("Launch stop thread");
+  logg.logMessage("Launch stop thread");
   while (!gQuit) {
     // This thread will stall until the APC_STOP or PING command is received over the socket or the socket is disconnected
     unsigned char header[5];
@@ -159,26 +158,26 @@ static void* stopThread(void* pVoid) {
     const int length = (header[1] << 0) | (header[2] << 8) | (header[3] << 16) | (header[4] << 24);
     if (result > 0) {
       if ((type != COMMAND_APC_STOP) && (type != COMMAND_PING)) {
-	logg->logMessage("INVESTIGATE: Received unknown command type %d", type);
+	logg.logMessage("INVESTIGATE: Received unknown command type %d", type);
       } else {
 	// verify a length of zero
 	if (length == 0) {
 	  if (type == COMMAND_APC_STOP) {
-	    logg->logMessage("Stop command received.");
+	    logg.logMessage("Stop command received.");
 	    gQuit = true;
 	  } else {
 	    // Ping is used to make sure gator is alive and requires an ACK as the response
-	    logg->logMessage("Ping command received.");
+	    logg.logMessage("Ping command received.");
 	    writeData(NULL, 0, RESPONSE_ACK);
 	  }
 	} else {
-	  logg->logMessage("INVESTIGATE: Received stop command but with length = %d", length);
+	  logg.logMessage("INVESTIGATE: Received stop command but with length = %d", length);
 	}
       }
     }
   }
 
-  logg->logMessage("Exit stop thread");
+  logg.logMessage("Exit stop thread");
   return 0;
 }
 
@@ -197,7 +196,7 @@ static void* senderThread(void* pVoid) {
     }
   }
 
-  logg->logMessage("Exit sender thread");
+  logg.logMessage("Exit sender thread");
   return 0;
 }
 
@@ -219,7 +218,7 @@ static void streamlineSetup(Device *const device) {
     waitingOnCommand = false;
 
     if (response < 0) {
-      logg->logError("Unexpected socket disconnect");
+      logg.logError("Unexpected socket disconnect");
       handleException();
     }
 
@@ -228,7 +227,7 @@ static void streamlineSetup(Device *const device) {
 
     // add artificial limit
     if ((length < 0) || length > 1024 * 1024) {
-      logg->logError("Invalid length received, %d", length);
+      logg.logError("Invalid length received, %d", length);
       handleException();
     }
 
@@ -237,14 +236,14 @@ static void streamlineSetup(Device *const device) {
       // allocate memory to contain the data
       data = (char*)calloc(length + 1, 1);
       if (data == NULL) {
-	logg->logError("Unable to allocate memory for xml");
+	logg.logError("Unable to allocate memory for xml");
 	handleException();
       }
 
       // receive data
       response = sock->receiveNBytes(data, length);
       if (response < 0) {
-	logg->logError("Unexpected socket disconnect");
+	logg.logError("Unexpected socket disconnect");
 	handleException();
       }
 
@@ -263,24 +262,24 @@ static void streamlineSetup(Device *const device) {
       break;
     }
     case COMMAND_DELIVER_XML:
-      logg->logError("Deliver XML command not supported");
+      logg.logError("Deliver XML command not supported");
       handleException();
     case COMMAND_APC_START:
-      logg->logMessage("Received apc start request");
+      logg.logMessage("Received apc start request");
       ready = true;
       break;
     case COMMAND_APC_STOP:
-      logg->logError("Received apc stop request before apc start request");
+      logg.logError("Received apc stop request before apc start request");
       handleException();
       break;
     case COMMAND_DISCONNECT:
       // Clear error log so no text appears on console and exit
-      logg->logMessage("Received disconnect command");
-      logg->logError("");
+      logg.logMessage("Received disconnect command");
+      logg.logError("");
       handleException();
       break;
     default:
-      logg->logError("Unknown command type, %d", type);
+      logg.logError("Unknown command type, %d", type);
       handleException();
     }
 
@@ -295,7 +294,7 @@ static void handleMagicSequence() {
   // Receive magic sequence - can wait forever
   while (strcmp("STREAMLINE", streamline) != 0) {
     if (sock->receiveString(streamline, sizeof(streamline)) == -1) {
-      logg->logError("Socket disconnected");
+      logg.logError("Socket disconnected");
       handleException();
     }
   }
@@ -306,7 +305,7 @@ static void handleMagicSequence() {
 
   // Magic sequence complete, now wait for a command from Streamline
   waitingOnCommand = true;
-  logg->logMessage("Completed magic sequence");
+  logg.logMessage("Completed magic sequence");
 }
 
 #if defined(SUPPORT_DAQ)
@@ -316,7 +315,7 @@ static void handleMagicSequence() {
 #endif
 
 static void printHelp(const char* const msg, const char* const version_string) {
-  logg->logError("%s"
+  logg.logError("%s"
 		 "%s\n"
 		 "At least one channel must be specified, all other parameters are optional:\n"
 		 "outputpath\tpath to store the apc data; default is current dir\n"
@@ -350,28 +349,28 @@ static struct cmdline_t parseCommandLine(int argc, char** argv) {
     if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-?") == 0 || strcmp(argv[i], "--help") == 0) {
       printHelp("", version_string);
     } else if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--version") == 0) {
-      logg->logError("%s", version_string);
+      logg.logError("%s", version_string);
       handleException();
     } else if (strcmp(argv[i], "-r") == 0) {
       if (++i == argc) {
-	logg->logError("No value provided on command line after -r option");
+	logg.logError("No value provided on command line after -r option");
 	handleException();
       }
       char * endptr;
       const long channel = strtol(argv[i], &endptr, 10);
       if (*endptr != ':') {
-	logg->logError("Value provided to -r is malformed");
+	logg.logError("Value provided to -r is malformed");
 	handleException();
       }
       const long value = strtol(endptr + 1, &endptr, 10);
       if ((*endptr != '\0') || (channel < 0) || (channel >= MAX_CHANNELS) || (value <= 0)) {
-	logg->logError("Value provided to -r is malformed");
+	logg.logError("Value provided to -r is malformed");
 	handleException();
       }
       gSessionData.mResistors[channel] = value;
     } else if (strcmp(argv[i], "-p") == 0) {
       if (++i == argc) {
-	logg->logError("No port number provided on command line after -p option");
+	logg.logError("No port number provided on command line after -p option");
 	handleException();
       }
       cmdline.port = strtol(argv[i], NULL, 10);
@@ -379,7 +378,7 @@ static struct cmdline_t parseCommandLine(int argc, char** argv) {
       cmdline.local = true;
     } else if (strcmp(argv[i], "-d") == 0) {
       if (++i == argc) {
-	logg->logError("No device name provided on command line after -d option");
+	logg.logError("No device name provided on command line after -d option");
 	handleException();
       }
       cmdline.device = argv[i];
@@ -387,12 +386,12 @@ static struct cmdline_t parseCommandLine(int argc, char** argv) {
 #if defined(SUPPORT_DAQ)
       cmdline.isdaq = true;
 #else
-      logg->logError("The --daq option is not supported in this build of caiman.");
+      logg.logError("The --daq option is not supported in this build of caiman.");
       handleException();
 #endif
     } else if (strcmp(argv[i], "--no-print-messages") == 0) {
       // Disables writing debug messages to stdout
-      logg->setPrintMessages(false);
+      logg.setPrintMessages(false);
     } else if (argv[i][0] == '-') {
       char buf[1024];
       snprintf(buf, sizeof(buf) - 1, "Unrecognized option '%s'\n", argv[i]);
@@ -415,8 +414,7 @@ int HOST_CDECL main(int argc, char *argv[]) {
   char* outputPath = (char*)malloc(CAIMAN_PATH_MAX + 1);  // MUST stay allocated
   char* binaryPath = (char*)malloc(CAIMAN_PATH_MAX + 1);
 
-  logg = new Logging(DEBUG);  // Set up global thread-safe logging
-  util = new OlyUtility();  // Set up global utility class
+  logg.setDebug(DEBUG);  // Set up global thread-safe logging
 
   // Parse the command line parameters
   struct cmdline_t cmdline = parseCommandLine(argc, argv);
@@ -438,25 +436,25 @@ int HOST_CDECL main(int argc, char *argv[]) {
   // Set up warnings file
   snprintf(binaryPath, CAIMAN_PATH_MAX, "%swarnings.xml", outputPath);
   unlink(binaryPath);
-  logg->SetWarningFile(binaryPath);
+  logg.SetWarningFile(binaryPath);
 
   // Create a string representing the path to the binary output file and open it
   snprintf(binaryPath, CAIMAN_PATH_MAX, "%s0000000000", outputPath);
   if (cmdline.local) {
     if ((binfile = fopen(binaryPath, "wb")) == 0) {
-      logg->logError("Unable to open output file: %s0000000000\nPlease check write permissions on this file.", outputPath);
+      logg.logError("Unable to open output file: %s0000000000\nPlease check write permissions on this file.", outputPath);
       handleException();
     }
   } else {
     if (sem_init(&senderSem, 0, 0) ||
 	sem_init(&senderThreadStarted, 0, 0)) {
-      logg->logError("sem_init() failed");
+      logg.logError("sem_init() failed");
       handleException();
     }
     fifo = new Fifo(1<<15, 1<<20, &senderSem);
     THREAD_CREATE(senderThreadID, senderThread);
     if (!senderThreadID) {
-      logg->logError("Failed to create sender thread");
+      logg.logError("Failed to create sender thread");
       handleException();
     }
   }
@@ -470,7 +468,7 @@ int HOST_CDECL main(int argc, char *argv[]) {
     device = new NiDaq(outputPath, binfile, fifo);
 #else
     // Intentionally redundant: CLI blocks isdaq if !SUPPORT_DAQ
-    logg->logError("National Instruments DAQ is not supported in this build.");
+    logg.logError("National Instruments DAQ is not supported in this build.");
     handleException();
 #endif
   } else {
@@ -482,7 +480,7 @@ int HOST_CDECL main(int argc, char *argv[]) {
   // Create a socket as long as local was not specified
   if (!cmdline.local) {
     waitingOnConnection = true;
-    logg->logMessage("Waiting on connection...");
+    logg.logMessage("Waiting on connection...");
     OlyServerSocket server(cmdline.port);
     sock = new OlySocket(server.acceptConnection());
     server.closeServerSocket();
@@ -497,7 +495,7 @@ int HOST_CDECL main(int argc, char *argv[]) {
     // Create stop thread
     THREAD_CREATE(stopThreadID, stopThread);
     if (!stopThreadID) {
-      logg->logError("Failed to create stop thread");
+      logg.logError("Failed to create stop thread");
       handleException();
     }
 
@@ -516,7 +514,7 @@ int HOST_CDECL main(int argc, char *argv[]) {
   while (!gQuit) {
     device->processBuffer();  // May (now) block thread for up to 1s (NiDaq)
   }
-  logg->logMessage("Get data loop finished; caiman is shutting down");
+  logg.logMessage("Get data loop finished; caiman is shutting down");
 
   device->stop();
 
@@ -533,8 +531,6 @@ int HOST_CDECL main(int argc, char *argv[]) {
   }
   delete device;
   delete sock;
-  delete logg;
-  delete util;
 
   return 0;
 }

@@ -30,22 +30,20 @@
 #endif
 
 // Global thread-safe logging
-Logging* logg = NULL;
+Logging logg;
 
-Logging::Logging(bool debug) {
+Logging::Logging() : mDebug(true) {
   mFileCreated = false;
   mWarningXMLPath[0] = 0;
-  mDebug = debug;
   mPrintMessages = true;
   MUTEX_INIT();
 
   strcpy(mErrBuf, "Unknown Error");
-  strcpy(mLogBuf, "Unknown Message");
 }
 
 Logging::~Logging() {
   if (mFileCreated) {
-    util->appendToDisk(mWarningXMLPath, "</warnings>");
+    appendToDisk(mWarningXMLPath, "</warnings>");
   }
 }
 
@@ -53,7 +51,7 @@ bool Logging::logWarning(const char* warning) {
   // Append the warning to the warning file if the warning file was created
   if (mWarningXMLPath[0] != 0) {
     if (!mFileCreated) {
-      if (util->writeToDisk(mWarningXMLPath, "<?xml version=\"1.0\" encoding='UTF-8'?>\n<warnings version=\"1\">\n") < 0) {
+      if (writeToDisk(mWarningXMLPath, "<?xml version=\"1.0\" encoding='UTF-8'?>\n<warnings version=\"1\">\n") < 0) {
 	return false;
       }
       mFileCreated = true;
@@ -106,19 +104,20 @@ void Logging::_logError(const char *function, const char *file, int line, const 
 
 void Logging::_logMessage(const char *function, const char *file, int line, const char *fmt, ...) {
   if (mDebug) {
+    char logBuf[4096]; // Arbitrarily large buffer to hold a string
     va_list args;
 
     MUTEX_LOCK();
-    snprintf(mLogBuf, sizeof(mLogBuf), "INFO: %s(%s:%i): ", function, file, line);
+    snprintf(logBuf, sizeof(logBuf), "INFO: %s(%s:%i): ", function, file, line);
 
     va_start(args, fmt);
-    vsnprintf(mLogBuf + strlen(mLogBuf), sizeof(mLogBuf) - 2 - strlen(mLogBuf), fmt, args); //  subtract 2 for \n and \0
+    vsnprintf(logBuf + strlen(logBuf), sizeof(logBuf) - 2 - strlen(logBuf), fmt, args); //  subtract 2 for \n and \0
     va_end(args);
 
-    bool warningLogged = logWarning(mLogBuf);
+    bool warningLogged = logWarning(logBuf);
 
     if (mPrintMessages || !warningLogged) {
-      fprintf(stdout, "%s\n", mLogBuf);
+      fprintf(stdout, "%s\n", logBuf);
       fflush(stdout);
     }
 

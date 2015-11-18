@@ -17,8 +17,10 @@
 #ifndef SESSION_DATA_H
 #define SESSION_DATA_H
 
+#include "Config.h"
+
 // This is an informational version only; no compatibility is performed based on this value
-#define CAIMAN_VERSION 22
+#define CAIMAN_VERSION 23
 // Differentiates development versions (timestamp) from release versions
 #define PROTOCOL_DEV 1000
 

@@ -43,7 +43,7 @@ void NiDaq::init(const char *device) {
     strncpy(mDev, device, MAX_DEVICE_LEN);
   }
 
-  logg->logMessage("Creating DAQ task .. this takes a while ..");
+  logg.logMessage("Creating DAQ task .. this takes a while ..");
 
   // First call to any mDaqMx method is slow when using DAQmx Base as it initializes everything
   // Create our task
@@ -52,7 +52,7 @@ void NiDaq::init(const char *device) {
   }
 
   // Out vendor name includes this devices serial number
-  unsigned long sn;
+  uint32_t sn;
   // This is our first DAQ call .. return a non-cryptic error if it fails
   if (!mDaqMx->getDevSerialNum(mDev, &sn)) {
     mDaqMx->handleFriendlyError("Could not get the serial number - is the DAQ connected?");
@@ -62,13 +62,13 @@ void NiDaq::init(const char *device) {
 
   // Configure enabled channels
   enableChannels();
-  logg->logMessage("Number of fields is %d, with %d DAQ channels enabled", mNumFields, mDaqChannels);
+  logg.logMessage("Number of fields is %d, with %d DAQ channels enabled", mNumFields, mDaqChannels);
 
   if (!mDaqMx->cfgSampClkTiming("", mSampleRate, mWindow)) {
     mDaqMx->handleError("CfgSampClkTiming");
   }
 
-  logg->logMessage("DAQ has been initialized");
+  logg.logMessage("DAQ has been initialized");
 }
 
 void NiDaq::start() {
@@ -98,7 +98,7 @@ void NiDaq::stop() {
 void NiDaq::processBuffer() {
   static const int BUF_SIZE = mWindow * MAX_CHANNELS;
   double data[BUF_SIZE];
-  long read = 0;
+  int32_t read = 0;
 
   // Read DAQ data
   // DAQmx_Val_GroupByScanNumber (interleaved), or DAQmx_Val_GroupByChannel
@@ -156,13 +156,13 @@ void NiDaq::processBuffer() {
 void NiDaq::lookup_daq() {
   mDev[0] = '\0';
   if (!mDaqMx->getSysDevNames(mDev, MAX_DEVICE_LEN)) {
-    logg->logError("Auto discovery of DAQ device name is not supported. "
+    logg.logError("Auto discovery of DAQ device name is not supported. "
 		   "Please specify a device with -d.");
     handleException();
   }
 
   if (mDev[0] == '\0') {
-    logg->logError("Device could not be found, please verify the device is attached or specify a device with -d.");
+    logg.logError("Device could not be found, please verify the device is attached or specify a device with -d.");
     handleException();
   }
 }
@@ -240,7 +240,7 @@ void NiDaq::enableChannels() {
 
     chan = daq_channel[index][mVoltageField];
     if (chan != NULL) {
-      logg->logMessage("Configuring DAQ '%s' as differential 0-5V (Voltage) channel", chan);
+      logg.logMessage("Configuring DAQ '%s' as differential 0-5V (Voltage) channel", chan);
       if (!mDaqMx->createAIVoltageChan(chan, NULL, 0.0, 5.0, NULL)) {
 	mDaqMx->handleError(chan);
       }
@@ -248,7 +248,7 @@ void NiDaq::enableChannels() {
 
     chan = daq_channel[index][mCurrentField];
     if (chan != NULL) {
-      logg->logMessage("Configuring DAQ '%s' as differential +-200mV (Current) channel", chan);
+      logg.logMessage("Configuring DAQ '%s' as differential +-200mV (Current) channel", chan);
       if (!mDaqMx->createAIVoltageChan(chan, NULL, -0.2, 0.2, NULL)) {
 	mDaqMx->handleError(chan);
       }

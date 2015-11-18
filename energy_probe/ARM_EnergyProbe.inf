@@ -1,0 +1,63 @@
+[Version]
+Signature=        "$Windows NT$"
+Class=            Ports
+ClassGuid=        {4D36E978-E325-11CE-BFC1-08002BE10318}
+Provider=         %ARM%
+DriverVer=        02/24/2012,1.0.0.0
+CatalogFile = ARM_EnergyProbe.cat
+
+[Manufacturer]
+%DriverProvider%=    DeviceList, NT, NTia64, NTamd64
+
+[DestinationDirs]
+DefaultDestDir=        12
+
+
+
+[DeviceList.NT]
+%Description%=ARM_EnergyProbe, USB\VID_0D28&PID_0004
+
+[DeviceList.NTia64]
+%Description%=ARM_EnergyProbe, USB\VID_0D28&PID_0004
+
+[DeviceList.NTamd64]
+%Description%=ARM_EnergyProbe, USB\VID_0D28&PID_0004
+
+
+
+[ARM_EnergyProbe.NT] 
+include=mdmcpq.inf
+CopyFiles=FakeModemCopyFileSection
+AddReg=LowerFilterAddReg
+
+[ARM_EnergyProbe.NTia64] 
+include=mdmcpq.inf
+CopyFiles= FakeModemCopyFileSection
+AddReg=LowerFilterAddReg
+
+[ARM_EnergyProbe.NTamd64] 
+include=mdmcpq.inf
+CopyFiles= FakeModemCopyFileSection
+AddReg=LowerFilterAddReg
+
+
+
+[ARM_EnergyProbe.NT.Services] 
+include = mdmcpq.inf
+AddService = usbser, 0x00000002, LowerFilter_Service_Inst
+
+[ARM_EnergyProbe.NTia64.Services] 
+include = mdmcpq.inf
+AddService = usbser, 0x00000002, LowerFilter_Service_Inst
+
+[ARM_EnergyProbe.NTamd64.Services] 
+include = mdmcpq.inf
+AddService = usbser, 0x00000002, LowerFilter_Service_Inst
+
+
+
+[Strings] 
+DriverProvider="ARM"
+DESCRIPTION="ARM Energy Probe"
+ARM="ARM Ltd" 
+
