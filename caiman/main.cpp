@@ -339,7 +339,13 @@ static struct cmdline_t parseCommandLine(int argc, char** argv) {
   cmdline.local = false;
 
   if (CAIMAN_VERSION < PROTOCOL_DEV) {
-    snprintf(version_string, sizeof(version_string) - 1, "Streamline caiman version %d (DS-5 v5.%d)", CAIMAN_VERSION, CAIMAN_VERSION);
+    const int majorVersion = CAIMAN_VERSION/10;
+    const int minorVersion = CAIMAN_VERSION%10;
+    if (minorVersion == 0) {
+      snprintf(version_string, sizeof(version_string) - 1, "Streamline caiman version %d (DS-5 v5.%d)", CAIMAN_VERSION, majorVersion);
+    } else {
+      snprintf(version_string, sizeof(version_string) - 1, "Streamline caiman version %d (DS-5 v5.%d.%d)", CAIMAN_VERSION, majorVersion, minorVersion);
+    }
   } else {
     snprintf(version_string, sizeof(version_string) - 1, "Streamline caiman development version %d", CAIMAN_VERSION);
   }

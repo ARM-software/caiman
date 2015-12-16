@@ -20,9 +20,9 @@
 #include "Config.h"
 
 // This is an informational version only; no compatibility is performed based on this value
-#define CAIMAN_VERSION 23
+#define CAIMAN_VERSION 231
 // Differentiates development versions (timestamp) from release versions
-#define PROTOCOL_DEV 1000
+#define PROTOCOL_DEV 10000000
 
 #define MAX_EPROBE_CHANNELS     3
 #define MAX_DAQ_CHANNELS        40  // A caiman 'channel' includes V+I
