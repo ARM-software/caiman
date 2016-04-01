@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ARM Limited 2011-2015. All rights reserved.
+ * Copyright (C) ARM Limited 2011-2016. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -379,7 +379,10 @@ static struct cmdline_t parseCommandLine(int argc, char** argv) {
 	logg.logError("No port number provided on command line after -p option");
 	handleException();
       }
-      cmdline.port = strtol(argv[i], NULL, 10);
+      if (!stringToInt(&cmdline.port, argv[i], 10)) {
+	logg.logError("Port number is not an integer");
+	handleException();
+      }
     } else if (strcmp(argv[i], "-l") == 0) {
       cmdline.local = true;
     } else if (strcmp(argv[i], "-d") == 0) {
@@ -424,6 +427,13 @@ int HOST_CDECL main(int argc, char *argv[]) {
 
   // Parse the command line parameters
   struct cmdline_t cmdline = parseCommandLine(argc, argv);
+
+#if !defined(WIN32)
+  if (geteuid() == 0) {
+    logg.logError("caiman should not be launched with root privileges");
+    handleException();
+  }
+#endif
 
   // Set default output path to this directory
   if (cmdline.path == NULL) {

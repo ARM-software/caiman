@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ARM Limited 2010-2015. All rights reserved.
+ * Copyright (C) ARM Limited 2010-2016. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@
 #ifdef WIN32
 #define PATH_SEPARATOR '\\'
 #define CAIMAN_PATH_MAX MAX_PATH
+#if !defined(_MSC_VER) || _MSC_VER < 1900
 #define snprintf _snprintf
+#endif
 #else
 #include <limits.h>
 #define PATH_SEPARATOR '/'
@@ -31,6 +33,9 @@
 
 bool stringToBool(const char* string, bool defValue);
 void stringToLower(char* string);
+bool stringToLongLong(long long *const value, const char *str, const int base);
+bool stringToLong(long *const value, const char *str, const int base);
+bool stringToInt(int *const value, const char *str, const int base);
 int getApplicationFullPath(char* path, int sizeOfPath);
 char* readFromDisk(const char* file, unsigned int *size = NULL, bool appendNull = true);
 int writeToDisk(const char* path, const char* file);

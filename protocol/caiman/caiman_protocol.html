@@ -38,11 +38,11 @@
       }
     </style>
     <script type="text/javascript" src="../topbar.js"></script>
-    <title>Caiman v23 (DS-5 v5.23) Protocol</title>
+    <title>Caiman v240 (DS-5 v5.24) Protocol</title>
   </head>
   <body>
     <div class="master">
-    <h1 id="top">Caiman v23 (DS-5 v5.23) Protocol</h1>
+    <h1 id="top">Caiman v240 (DS-5 v5.24) Protocol</h1>
     <h2 id="Index">Index</h2>
     <ul>
       <li>
@@ -79,15 +79,15 @@
       </li>
     </ul>
     <h2 id="Introduction">Introduction</h2>
-    <p>This document describes the TCP/IP protocol used by caiman or other implementing clients to communicate with Streamline version 5.23. Use this information to build a customized client to communicate energy data to Streamline. The caiman source code, distributed as part of <a href="http://www.arm.com/products/tools/software-tools/ds-5/index.php">DS-5</a>, is the reference implementation of this protocol. The protocol may change with future releases of Streamline, but Streamline will maintain backwards compatibility with this version of the protocol so that clients need only implement one version of the protocol. Streamline requires that your client is able to parse and generate simple XML and ignore additional or unexpected nodes or attributes. Because the XML features described in this protocol documentation are the only ones used, this protocol does not require the more complex features of XML.</p>
+    <p>This document describes the TCP/IP protocol used by caiman or other implementing clients to communicate with Streamline version 5.24. Use this information to build a customized client to communicate energy data to Streamline. The caiman source code, distributed as part of <a href="http://www.arm.com/products/tools/software-tools/ds-5/index.php">DS-5</a>, is the reference implementation of this protocol. The protocol may change with future releases of Streamline, but Streamline will maintain backwards compatibility with this version of the protocol so that clients need only implement one version of the protocol. Streamline requires that your client is able to parse and generate simple XML and ignore additional or unexpected nodes or attributes. Because the XML features described in this protocol documentation are the only ones used, this protocol does not require the more complex features of XML.</p>
     <h2 id="Protocol">Target-Host Protocol</h2>
     <h3 id="Magic">Magic Exchange</h3>
     <p>A handshake is required so that your client and Streamline can recognize each other. It consists of ASCII newline (\n) delimited strings. If the client receives a string it does not recognize, the string must be discarded and another string is read.</p>
     <p>The standard Streamline client is caiman. But, as you can customize caiman and call it what you wish, the term client is used generically to refer to your customized protocol.</p>
     <ol>
-      <li>The client receives Streamline's highest supported protocol version <span class="literal">VERSION $VER\n</span>, for example if Streamline supports up to version 23, the client would receive <span class="literal">VERSION 23\n</span>.</li>
+      <li>The client receives Streamline's highest supported protocol version <span class="literal">VERSION $VER\n</span>, for example if Streamline supports up to version 240, the client would receive <span class="literal">VERSION 240\n</span>.</li>
       <li>The client receives <span class="literal">STREAMLINE\n</span></li>
-      <li>Send <span class="literal">CAIMAN 23\n</span></li>
+      <li>Send <span class="literal">CAIMAN 240\n</span></li>
     </ol>
     <p>Further communication from Streamline comes as <a href="#CommandHeader">Commands</a></p>
     <h3 id="CommandHeader">Command Header</h3>
@@ -202,7 +202,7 @@
       <tr>
 	<td>version</td>
 	<td>Integer</td>
-	<td><span class="circle">23</span></td>
+	<td><span class="circle">240</span></td>
       </tr>
     </table>
     <p><b>target</b></p>
@@ -270,7 +270,7 @@
     <p>Example:</p>
     <p class="literal">
       &lt;?xml version="1.0" encoding='UTF-8'?&gt;<br/>
-      &lt;captured version="23"&gt;<br/>
+      &lt;captured version="240"&gt;<br/>
       &nbsp;&nbsp;&lt;target name="ARM Streamline Energy Probe" sample_rate="10000" sources="6" size="4"/&gt;<br/>
       &nbsp;&nbsp;&lt;counters&gt;<br/>
       &nbsp;&nbsp;&nbsp;&nbsp;&lt;counter source="0" channel="0" type="Power" resistance="20"/&gt;<br/>
