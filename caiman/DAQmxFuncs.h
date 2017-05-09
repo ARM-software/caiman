@@ -23,39 +23,45 @@
 #define NI_DAQMX_SUPPORT
 #endif
 
-class DAQmxFuncs {
+class DAQmxFuncs
+{
 public:
-  static DAQmxFuncs * getInstance();
+    static DAQmxFuncs * getInstance();
 
-  virtual ~DAQmxFuncs () {}
+    virtual ~DAQmxFuncs()
+    {
+    }
 
-  virtual bool cfgSampClkTiming(const char arg1[], double arg2, uint64_t arg5) = 0;
-  virtual bool clearTask() = 0;
-  virtual bool createAIVoltageChan(const char arg1[], const char arg2[], double arg4, double arg5, const char arg6[]) = 0;
-  virtual bool createTask(const char arg0[]) = 0;
-  virtual bool getDevSerialNum(const char arg0[], uint32_t *arg1) = 0;
-  virtual bool getExtendedErrorInfo(char errorString[], uint32_t bufferSize) = 0;
-  virtual bool getSysDevNames(char * arg1, uint32_t arg2) = 0;
-  virtual bool readAnalogF64(int32_t arg1, double arg2, double arg4[], uint32_t arg5, int32_t *arg6, uint32_t *arg7) = 0;
-  virtual bool startTask() = 0;
-  virtual bool stopTask() = 0;
+    virtual bool cfgSampClkTiming(const char arg1[], double arg2, uint64_t arg5) = 0;
+    virtual bool clearTask() = 0;
+    virtual bool createAIVoltageChan(const char arg1[], const char arg2[], double arg4, double arg5, const char arg6[]) = 0;
+    virtual bool createTask(const char arg0[]) = 0;
+    virtual bool getDevSerialNum(const char arg0[], uint32_t *arg1) = 0;
+    virtual bool getExtendedErrorInfo(char errorString[], uint32_t bufferSize) = 0;
+    virtual bool getSysDevNames(char * arg1, uint32_t arg2) = 0;
+    virtual bool readAnalogF64(int32_t arg1, double arg2, double arg4[], uint32_t arg5, int32_t *arg6, uint32_t *arg7) = 0;
+    virtual bool startTask() = 0;
+    virtual bool stopTask() = 0;
 
 #define handleError(id) _handleError(__FUNCTION__, __FILE__, __LINE__, id)
-  void _handleError(const char *function, const char *file, int line, const char *id);
-  void handleFriendlyError(const char *msg);
+    void _handleError(const char *function, const char *file, int line, const char *id);
+    void handleFriendlyError(const char *msg);
 
 protected:
-  DAQmxFuncs () : m_lastStatus(0) {}
+    DAQmxFuncs()
+            : m_lastStatus(0)
+    {
+    }
 
-  virtual bool loadDlls() = 0;
+    virtual bool loadDlls() = 0;
 
-  signed long m_lastStatus;
+    signed long m_lastStatus;
 
 private:
 #ifdef NI_DAQMX_SUPPORT
-  static DAQmxFuncs * getDAQmx();
+    static DAQmxFuncs * getDAQmx();
 #endif
-  static DAQmxFuncs * getDAQmxBase();
+    static DAQmxFuncs * getDAQmxBase();
 };
 
 #endif // DAQMX_H

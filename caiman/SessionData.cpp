@@ -20,76 +20,82 @@
 
 SessionData gSessionData;
 
-SessionData::SessionData() {
-  initialize();
+SessionData::SessionData()
+{
+    initialize();
 }
 
-SessionData::~SessionData() {
+SessionData::~SessionData()
+{
 }
 
-void SessionData::initialize() {
-  for (int i = 0; i < MAX_COUNTERS; i++) {
-    mCounterField[i] = 0;
-    mCounterChannel[i] = 0;
-    mCounterSource[i] = 0;
-    mCounterEnabled[i] = false;
+void SessionData::initialize()
+{
+    for (int i = 0; i < MAX_COUNTERS; i++) {
+        mCounterField[i] = 0;
+        mCounterChannel[i] = 0;
+        mCounterSource[i] = 0;
+        mCounterEnabled[i] = false;
 
-  }
+    }
 
-  for (int i = 0; i < MAX_CHANNELS; i++) {
-    mChannelEnabled[i] = false;
-    mResistors[i] = 0;
-  }
+    for (int i = 0; i < MAX_CHANNELS; i++) {
+        mChannelEnabled[i] = false;
+        mResistors[i] = 0;
+    }
 
-  mMaxEnabledChannel = -1;
+    mMaxEnabledChannel = -1;
 }
 
-void SessionData::compileData() {
-  static bool compiled = false;
+void SessionData::compileData()
+{
+    static bool compiled = false;
 
-  if (compiled) return;
+    if (compiled)
+        return;
 
-  int channelsConfigured = 0;
-  for (int channel = 0; channel < MAX_CHANNELS; ++channel) {
-    // Is a resistor value given for each enabled channel?
-    if (mResistors[channel] <= 0) {
-      continue;
+    int channelsConfigured = 0;
+    for (int channel = 0; channel < MAX_CHANNELS; ++channel) {
+        // Is a resistor value given for each enabled channel?
+        if (mResistors[channel] <= 0) {
+            continue;
+        }
+
+        mChannelEnabled[channel] = true;
+
+        for (int field = 0; field < 3; ++field) {
+            static const int field_num[] = { POWER, CURRENT, VOLTAGE };
+            static const int field_source[] = { 0, 2, 1 };
+
+            const int index = 3 * channelsConfigured + field;
+            mCounterChannel[index] = channel;
+            mCounterField[index] = field_num[field];
+            mCounterDaqCh[index][0] = '\0';
+            mCounterEnabled[index] = true;
+
+            // Determine sources
+            // Source always in the following order, as per energy meter device:
+            // ch0 pwr, ch0 volt, ch0 curr, ch1 pwr, ch1 volt, ch1 curr, ch2 pwr, etc.
+            mCounterSource[index] = 3 * channelsConfigured + field_source[field];
+            if (mCounterField[index] == POWER || mCounterField[index] == CURRENT) {
+                mSourceScaleFactor[mCounterSource[index]] = 100 / (float) mResistors[channel];
+            }
+            else {
+                mSourceScaleFactor[mCounterSource[index]] = 1;
+            }
+        }
+
+        ++channelsConfigured;
+
+        if (channel > mMaxEnabledChannel) {
+            mMaxEnabledChannel = channel;
+        }
     }
 
-    mChannelEnabled[channel] = true;
-
-    for (int field = 0; field < 3; ++field) {
-      static const int field_num[] = { POWER, CURRENT, VOLTAGE };
-      static const int field_source[] = {0, 2, 1};
-
-      const int index = 3*channelsConfigured + field;
-      mCounterChannel[index] = channel;
-      mCounterField[index] = field_num[field];
-      mCounterDaqCh[index][0] = '\0';
-      mCounterEnabled[index] = true;
-
-      // Determine sources
-      // Source always in the following order, as per energy meter device:
-      // ch0 pwr, ch0 volt, ch0 curr, ch1 pwr, ch1 volt, ch1 curr, ch2 pwr, etc.
-      mCounterSource[index] = 3*channelsConfigured + field_source[field];
-      if (mCounterField[index] == POWER || mCounterField[index] == CURRENT) {
-	mSourceScaleFactor[mCounterSource[index]] = 100 / (float)mResistors[channel];
-      } else {
-	mSourceScaleFactor[mCounterSource[index]] = 1;
-      }
+    if (mMaxEnabledChannel < 0) {
+        logg.logError("No channels enabled, please ensure resistance values are set");
+        handleException();
     }
 
-    ++channelsConfigured;
-
-    if (channel > mMaxEnabledChannel) {
-      mMaxEnabledChannel = channel;
-    }
-  }
-
-  if (mMaxEnabledChannel < 0) {
-    logg.logError("No channels enabled, please ensure resistance values are set");
-    handleException();
-  }
-
-  compiled = true;
+    compiled = true;
 }

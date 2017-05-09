@@ -20,6 +20,7 @@
 #include <stddef.h>
 
 #ifdef WIN32
+#include <stdio.h>
 #define PATH_SEPARATOR '\\'
 #define CAIMAN_PATH_MAX MAX_PATH
 #if !defined(_MSC_VER) || _MSC_VER < 1900
@@ -33,9 +34,9 @@
 
 bool stringToBool(const char* string, bool defValue);
 void stringToLower(char* string);
-bool stringToLongLong(long long *const value, const char *str, const int base);
-bool stringToLong(long *const value, const char *str, const int base);
-bool stringToInt(int *const value, const char *str, const int base);
+bool stringToLongLong(long long * const value, const char *str, const int base);
+bool stringToLong(long * const value, const char *str, const int base);
+bool stringToInt(int * const value, const char *str, const int base);
 int getApplicationFullPath(char* path, int sizeOfPath);
 char* readFromDisk(const char* file, unsigned int *size = NULL, bool appendNull = true);
 int writeToDisk(const char* path, const char* file);

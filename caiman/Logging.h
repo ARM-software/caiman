@@ -26,33 +26,47 @@
 
 #include "OlyUtility.h"
 
-class Logging {
+class Logging
+{
 public:
-  Logging();
-  ~Logging();
+    Logging();
+    ~Logging();
 
-  void setDebug(bool debug) { mDebug = debug; }
+    void setDebug(bool debug)
+    {
+        mDebug = debug;
+    }
 #define logError(...) _logError(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
-  void _logError(const char *function, const char *file, int line, const char* fmt, ...);
+    void _logError(const char *function, const char *file, int line, const char* fmt, ...);
 #define logMessage(...) _logMessage(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
-  void _logMessage(const char *function, const char *file, int line, const char* fmt, ...);
-  void SetWarningFile(const char* path) {strncpy(mWarningXMLPath, path, CAIMAN_PATH_MAX); mWarningXMLPath[CAIMAN_PATH_MAX - 1] = 0;}
-  const char* getLastError() {return mErrBuf;}
-  void setPrintMessages(const bool printMessages) { mPrintMessages = printMessages; }
+    void _logMessage(const char *function, const char *file, int line, const char* fmt, ...);
+    void SetWarningFile(const char* path)
+    {
+        strncpy(mWarningXMLPath, path, CAIMAN_PATH_MAX);
+        mWarningXMLPath[CAIMAN_PATH_MAX - 1] = 0;
+    }
+    const char* getLastError()
+    {
+        return mErrBuf;
+    }
+    void setPrintMessages(const bool printMessages)
+    {
+        mPrintMessages = printMessages;
+    }
 
 private:
-  bool logWarning(const char* warning);
+    bool logWarning(const char* warning);
 
-  char mWarningXMLPath[CAIMAN_PATH_MAX];
-  char mErrBuf[4096]; // Arbitrarily large buffer to hold a string
-  bool mDebug;
-  bool mFileCreated;
+    char mWarningXMLPath[CAIMAN_PATH_MAX];
+    char mErrBuf[4096]; // Arbitrarily large buffer to hold a string
+    bool mDebug;
+    bool mFileCreated;
 #ifdef WIN32
-  HANDLE mLoggingMutex;
+    HANDLE mLoggingMutex;
 #else
-  pthread_mutex_t mLoggingMutex;
+    pthread_mutex_t mLoggingMutex;
 #endif
-  bool mPrintMessages;
+    bool mPrintMessages;
 };
 
 extern Logging logg;

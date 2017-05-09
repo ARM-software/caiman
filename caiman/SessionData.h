@@ -20,7 +20,7 @@
 #include "Config.h"
 
 // This is an informational version only; no compatibility is performed based on this value
-#define CAIMAN_VERSION 240
+#define CAIMAN_VERSION 620
 // Differentiates development versions (timestamp) from release versions
 #define PROTOCOL_DEV 10000000
 
@@ -35,41 +35,43 @@
 #define MAX_DESCRIPTION_LEN 400
 
 // Fields
-static const char * const field_title_names[] = {"", "Power", "Voltage", "", "Current"};
-enum {
-  POWER = 1,
-  VOLTAGE = 2,
-  CURRENT = 4
+static const char * const field_title_names[] = { "", "Power", "Voltage", "", "Current" };
+enum
+{
+    POWER = 1,
+    VOLTAGE = 2,
+    CURRENT = 4
 };
 
-class SessionData {
+class SessionData
+{
 public:
-  SessionData();
-  ~SessionData();
-  void initialize();
-  void compileData();
+    SessionData();
+    ~SessionData();
+    void initialize();
+    void compileData();
 
-  // Counters
-  // one of power, voltage, or current
-  int mCounterField[MAX_COUNTERS];
-  // channel 0, 1, or 2
-  int mCounterChannel[MAX_COUNTERS];
-  // which source of data emitted from the energy probe, 0-8
-  int mCounterSource[MAX_COUNTERS];
-  // DAQ Channel, such as 'ai1', 'ai2', etc.
-  char mCounterDaqCh[MAX_COUNTERS][MAX_STRING_LEN];
-  // whether this counter is enabled
-  bool mCounterEnabled[MAX_COUNTERS];
+    // Counters
+    // one of power, voltage, or current
+    int mCounterField[MAX_COUNTERS];
+    // channel 0, 1, or 2
+    int mCounterChannel[MAX_COUNTERS];
+    // which source of data emitted from the energy probe, 0-8
+    int mCounterSource[MAX_COUNTERS];
+    // DAQ Channel, such as 'ai1', 'ai2', etc.
+    char mCounterDaqCh[MAX_COUNTERS][MAX_STRING_LEN];
+    // whether this counter is enabled
+    bool mCounterEnabled[MAX_COUNTERS];
 
-  // scale factor based on a 0.1 ohm shunt resistor
-  float mSourceScaleFactor[MAX_FIELDS];
+    // scale factor based on a 0.1 ohm shunt resistor
+    float mSourceScaleFactor[MAX_FIELDS];
 
-  // whether this channel is enabled
-  bool mChannelEnabled[MAX_CHANNELS];
-  // shunt resistor
-  int mResistors[MAX_CHANNELS];
+    // whether this channel is enabled
+    bool mChannelEnabled[MAX_CHANNELS];
+    // shunt resistor
+    int mResistors[MAX_CHANNELS];
 
-  int mMaxEnabledChannel;
+    int mMaxEnabledChannel;
 };
 
 extern SessionData gSessionData;

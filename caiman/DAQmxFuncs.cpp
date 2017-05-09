@@ -25,55 +25,55 @@
 // Utility for formatting errors from DAQ dll. Logs
 // the error, so all the caller has to do is propagate error
 void DAQmxFuncs::_handleError(const char *function, const char *file, int line, const char *id) {
-  static const int BUFLEN=2048;
-  char buf[BUFLEN];
-  buf[BUFLEN-1] = 0;
-  getExtendedErrorInfo(buf, BUFLEN-2);
-  int len  = strlen(buf);
-  int want = 80+strlen(id);
-  if ((BUFLEN-len) > want) {
-    snprintf(&buf[len], want, " (DAQmx code %d, in '%s.')", (int)m_lastStatus, id);
-  }
+    static const int BUFLEN=2048;
+    char buf[BUFLEN];
+    buf[BUFLEN-1] = 0;
+    getExtendedErrorInfo(buf, BUFLEN-2);
+    int len = strlen(buf);
+    int want = 80+strlen(id);
+    if ((BUFLEN-len) > want) {
+        snprintf(&buf[len], want, " (DAQmx code %d, in '%s.')", (int)m_lastStatus, id);
+    }
 
-  logg._logError(function, file, line, buf);
-  handleException();
+    logg._logError(function, file, line, buf);
+    handleException();
 }
 
 // 'Friendly' version that doesn't report the sometimes cryptic extended DAQ error info
 void DAQmxFuncs::handleFriendlyError(const char *msg) {
-  static const int BUFLEN=2048;
-  char buf[BUFLEN];
-  buf[BUFLEN-1] = 0;
-  snprintf(buf, BUFLEN, "%s (DAQmx code %d)", msg, (int)m_lastStatus);
-  logg.logError(buf);
-  handleException();
+    static const int BUFLEN=2048;
+    char buf[BUFLEN];
+    buf[BUFLEN-1] = 0;
+    snprintf(buf, BUFLEN, "%s (DAQmx code %d)", msg, (int)m_lastStatus);
+    logg.logError(buf);
+    handleException();
 }
 
 DAQmxFuncs * DAQmxFuncs::getInstance() {
 #ifdef NI_DAQMX_SUPPORT
-  DAQmxFuncs * daqMx = getDAQmx();
-  if (daqMx->loadDlls()) {
-    return daqMx;
-  }
+    DAQmxFuncs * daqMx = getDAQmx();
+    if (daqMx->loadDlls()) {
+        return daqMx;
+    }
 #endif
 
-  DAQmxFuncs * daqMxBase = getDAQmxBase();
-  if (daqMxBase->loadDlls()) {
-    return daqMxBase;
-  }
+    DAQmxFuncs * daqMxBase = getDAQmxBase();
+    if (daqMxBase->loadDlls()) {
+        return daqMxBase;
+    }
 
-  const int bitsize = 8*sizeof(void *);
-  const int otherBitsize = bitsize == 32 ? 64 : 32;
-  const char *const msg =
+    const int bitsize = 8*sizeof(void *);
+    const int otherBitsize = bitsize == 32 ? 64 : 32;
+    const char *const msg =
     "Unable to find a %i-bit version of "
 #ifdef NI_DAQMX_SUPPORT
     "NI-DAQmx or "
 #endif
     "NI-DAQmx Base from National Instruments. If it is already installed, you may need to try the %i-bit version of caiman.";
-  logg.logError(msg, bitsize, otherBitsize);
-  handleException();
+    logg.logError(msg, bitsize, otherBitsize);
+    handleException();
 
-  return NULL;
+    return NULL;
 }
 
 #endif

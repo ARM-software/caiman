@@ -25,35 +25,35 @@
 #include "Logging.h"
 
 DLLHANDLE load_dll(const char *name) {
-  DLLHANDLE handle;
+    DLLHANDLE handle;
 
-  logg.logMessage("Trying to load '%s'", name);
+    logg.logMessage("Trying to load '%s'", name);
 #if defined (WIN32)
-  handle = LoadLibrary(name);
+    handle = LoadLibrary(name);
 #elif defined (__linux__) || defined(DARWIN)
-  handle = dlopen(name, RTLD_NOW);
+    handle = dlopen(name, RTLD_NOW);
 #endif
 
-  if (handle == NULL) {
-    logg.logMessage("Couldn't find shared library '%s'", name);
-  }
+    if (handle == NULL) {
+        logg.logMessage("Couldn't find shared library '%s'", name);
+    }
 
-  return handle;  // NULL on failure
+    return handle; // NULL on failure
 }
 
 void *load_symbol(DLLHANDLE handle, const char *name) {
-  void *symbol;
+    void *symbol;
 
-  logg.logMessage("Trying to find symbol '%s'", name);
+    logg.logMessage("Trying to find symbol '%s'", name);
 #if defined (WIN32)
-  symbol = (void *)GetProcAddress(handle, name);
+                  symbol = (void *)GetProcAddress(handle, name);
 #else
-  symbol = dlsym(handle, name);
+                  symbol = dlsym(handle, name);
 #endif
 
-  if (symbol == NULL) {
-    logg.logMessage("Couldn't find symbol '%s'", name);
-  }
+                  if (symbol == NULL) {
+                      logg.logMessage("Couldn't find symbol '%s'", name);
+                  }
 
-  return symbol;
-}
+                  return symbol;
+              }

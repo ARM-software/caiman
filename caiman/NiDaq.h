@@ -21,42 +21,43 @@
 
 #include "DAQmxFuncs.h"
 
-class NiDaq : public Device {
+class NiDaq : public Device
+{
 public:
-  NiDaq(const char *outputPath, FILE *binfile, Fifo *fifo);
-  virtual ~NiDaq();
+    NiDaq(const char *outputPath, FILE *binfile, Fifo *fifo);
+    virtual ~NiDaq();
 
-  virtual void prepareChannels();
-  virtual void init(const char *device);
-  virtual void start();
-  virtual void stop();
-  virtual void processBuffer();
+    virtual void prepareChannels();
+    virtual void init(const char *device);
+    virtual void start();
+    virtual void stop();
+    virtual void processBuffer();
 
 private:
-  void enableChannels();
-  void lookup_daq();
-  char *get_channel_info(char *config_chan, int field, int chan);
+    void enableChannels();
+    void lookup_daq();
+    char *get_channel_info(char *config_chan, int field, int chan);
 
-  static const int mWindow = mSampleRate/10;
+    static const int mWindow = mSampleRate / 10;
 
-  static const int mVoltageField = 0;  // Used to determine DAQ channel numbering.
-  static const int mCurrentField = 1;  // (Default is Voltage channel first.)
+    static const int mVoltageField = 0; // Used to determine DAQ channel numbering.
+    static const int mCurrentField = 1; // (Default is Voltage channel first.)
 
-  // Initialized on construction
-  bool mIsRunning;
-  bool mDllsLoaded;
+    // Initialized on construction
+    bool mIsRunning;
+    bool mDllsLoaded;
 
-  // Initialized on init
-  DAQmxFuncs *mDaqMx;
-  static const int MAX_DEVICE_LEN = 120;
-  char mDev[MAX_DEVICE_LEN];
-  int mDaqChannels;
+    // Initialized on init
+    DAQmxFuncs *mDaqMx;
+    static const int MAX_DEVICE_LEN = 120;
+    char mDev[MAX_DEVICE_LEN];
+    int mDaqChannels;
 
-  char mFields[MAX_CHANNELS];
+    char mFields[MAX_CHANNELS];
 
-  // Intentionally unimplemented
-  NiDaq(const NiDaq &);
-  NiDaq &operator=(const NiDaq &);
+    // Intentionally unimplemented
+    NiDaq(const NiDaq &);
+    NiDaq &operator=(const NiDaq &);
 };
 
 #endif // NIDAQ_H
