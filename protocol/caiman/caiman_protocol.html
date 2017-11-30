@@ -46,40 +46,40 @@
     <h2 id="Index">Index</h2>
     <ul>
       <li>
-	<a href="#Introduction">Introduction</a>
+    <a href="#Introduction">Introduction</a>
       </li>
       <li>
-	<a href="#Protocol">Target-Host Protocol</a>
-	<ul>
-	  <li><a href="#Magic">Magic Exchange</a></li>
-	  <li><a href="#CommandHeader">Command Header</a></li>
-	  <li><a href="#CommandRequestXML">Request XML Body</a></li>
-	  <li><a href="#CommandAPCStart">APC Start Body</a></li>
-	  <li><a href="#CommandAPCStop">APC Stop Body</a></li>
-	  <li><a href="#CommandDisconnect">Disconnect Body</a></li>
-	  <li><a href="#CommandPing">Ping Body</a></li>
-	</ul>
+    <a href="#Protocol">Target-Host Protocol</a>
+    <ul>
+      <li><a href="#Magic">Magic Exchange</a></li>
+      <li><a href="#CommandHeader">Command Header</a></li>
+      <li><a href="#CommandRequestXML">Request XML Body</a></li>
+      <li><a href="#CommandAPCStart">APC Start Body</a></li>
+      <li><a href="#CommandAPCStop">APC Stop Body</a></li>
+      <li><a href="#CommandDisconnect">Disconnect Body</a></li>
+      <li><a href="#CommandPing">Ping Body</a></li>
+    </ul>
       </li>
       <li>
-	<a href="#Response">Response Format</a>
-	<ul>
-	  <li><a href="#ResponseHeader">Response Header</a></li>
-	  <li><a href="#ResponseXML">XML Body</a></li>
-	  <li><a href="#ResponseApcData">APC Data Body</a></li>
-	  <li><a href="#ResponseAck">ACK Body</a></li>
-	  <li><a href="#ResponseNak">NAK Body</a></li>
-	  <li><a href="#ResponseError">Error Body</a></li>
-	</ul>
+    <a href="#Response">Response Format</a>
+    <ul>
+      <li><a href="#ResponseHeader">Response Header</a></li>
+      <li><a href="#ResponseXML">XML Body</a></li>
+      <li><a href="#ResponseApcData">APC Data Body</a></li>
+      <li><a href="#ResponseAck">ACK Body</a></li>
+      <li><a href="#ResponseNak">NAK Body</a></li>
+      <li><a href="#ResponseError">Error Body</a></li>
+    </ul>
       </li>
       <li>
-	<a href="#XML">XML</a>
-	<ul>
-	  <li><a href="#XMLCaptured">Captured</a></li>
-	</ul>
+    <a href="#XML">XML</a>
+    <ul>
+      <li><a href="#XMLCaptured">Captured</a></li>
+    </ul>
       </li>
     </ul>
     <h2 id="Introduction">Introduction</h2>
-    <p>This document describes the TCP/IP protocol used by caiman or other implementing clients to communicate with Streamline version 5.24. Use this information to build a customized client to communicate energy data to Streamline. The caiman source code, distributed as part of <a href="http://www.arm.com/products/tools/software-tools/ds-5/index.php">DS-5</a>, is the reference implementation of this protocol. The protocol may change with future releases of Streamline, but Streamline will maintain backwards compatibility with this version of the protocol so that clients need only implement one version of the protocol. Streamline requires that your client is able to parse and generate simple XML and ignore additional or unexpected nodes or attributes. Because the XML features described in this protocol documentation are the only ones used, this protocol does not require the more complex features of XML.</p>
+    <p>This document describes the TCP/IP protocol used by caiman or other implementing clients to communicate with Streamline version 5.24 and later. Use this information to build a customized client to communicate energy data to Streamline. The caiman source code, distributed as part of <a href="http://www.arm.com/products/tools/software-tools/ds-5/index.php">DS-5</a>, is the reference implementation of this protocol. The protocol may change with future releases of Streamline, but Streamline will maintain backwards compatibility with this version of the protocol so that clients need only implement one version of the protocol. Streamline requires that your client is able to parse and generate simple XML and ignore additional or unexpected nodes or attributes. Because the XML features described in this protocol documentation are the only ones used, this protocol does not require the more complex features of XML.</p>
     <h2 id="Protocol">Target-Host Protocol</h2>
     <h3 id="Magic">Magic Exchange</h3>
     <p>A handshake is required so that your client and Streamline can recognize each other. It consists of ASCII newline (\n) delimited strings. If the client receives a string it does not recognize, the string must be discarded and another string is read.</p>
@@ -95,27 +95,27 @@
     <p/>
     <table>
       <tr>
-	<th><span class="white">Name</span></th>
-	<th><span class="white">Type</span></th>
-	<th><span class="white">Description</span></th>
+    <th><span class="white">Name</span></th>
+    <th><span class="white">Type</span></th>
+    <th><span class="white">Description</span></th>
       </tr>
       <tr>
-	<td>Code</td>
-	<td>int8</td>
-	<td>The type of command
-	  <table class="none">
-	    <tr><td>0</td><td>= <a href="#CommandRequestXML">Request XML</a></td></tr>
+    <td>Code</td>
+    <td>int8</td>
+    <td>The type of command
+      <table class="none">
+        <tr><td>0</td><td>= <a href="#CommandRequestXML">Request XML</a></td></tr>
             <tr><td>2</td><td>= <a href="#CommandAPCStart">APC Start</a></td></tr>
             <tr><td>3</td><td>= <a href="#CommandAPCStop">APC Stop</a></td></tr>
             <tr><td>4</td><td>= <a href="#CommandDisconnect">Disconnect</a></td></tr>
             <tr><td>5</td><td>= <a href="#CommandPing">Ping</a></td></tr>
-	  </table>
-	</td>
+      </table>
+    </td>
       </tr>
       <tr>
-	<td>Length</td>
-	<td>Little Endian int32</td>
-	<td>Number of bytes in the body</td>
+    <td>Length</td>
+    <td>Little Endian int32</td>
+    <td>Number of bytes in the body</td>
       </tr>
     </table>
     <p>If the client receives an unrecognized command, it should respond with a <a href="#ResponseNak">NAK</a>.</p>
@@ -129,14 +129,14 @@
     <p/>
     <table>
       <tr>
-	<th><span class="white">Request</span></th>
-	<th><span class="white">Response Code</span></th>
-	<th><span class="white">Response Body</span></th>
+    <th><span class="white">Request</span></th>
+    <th><span class="white">Response Code</span></th>
+    <th><span class="white">Response Body</span></th>
       </tr>
       <tr>
-	<td><span class="literal">&lt;request type="captured"&gt;</span></td>
-	<td>XML</td>
-	<td><a href="#XMLCaptured">Captured XML</a> Streamline requests Captured XML prior to starting a capture.</td>
+    <td><span class="literal">&lt;request type="captured"&gt;</span></td>
+    <td>XML</td>
+    <td><a href="#XMLCaptured">Captured XML</a> Streamline requests Captured XML prior to starting a capture.</td>
       </tr>
     </table>
     <h3 id="CommandAPCStart">APC Start Body</h3>
@@ -154,27 +154,27 @@
     <p/>
     <table>
       <tr>
-	<th><span class="white">Name</span></th>
-	<th><span class="white">Type</span></th>
-	<th><span class="white">Description</span></th>
+    <th><span class="white">Name</span></th>
+    <th><span class="white">Type</span></th>
+    <th><span class="white">Description</span></th>
       </tr>
       <tr>
-	<td>Code</td>
-	<td>int8</td>
-	<td>The type of command
-	  <table class="none">
-	    <tr><td>1</td><td>= <a href="#ResponseXML">XML</a></td></tr>
-	    <tr><td>3</td><td>= <a href="#ResponseApcData">APC Data</a></td></tr>
-	    <tr><td>4</td><td>= <a href="#ResponseAck">ACK</a></td></tr>
-	    <tr><td>5</td><td>= <a href="#ResponseNak">NAK</a></td></tr>
-	    <tr><td>0xFF</td><td>= <a href="#ResponseError">Error</a></td></tr>
-	  </table>
-	</td>
+    <td>Code</td>
+    <td>int8</td>
+    <td>The type of command
+      <table class="none">
+        <tr><td>1</td><td>= <a href="#ResponseXML">XML</a></td></tr>
+        <tr><td>3</td><td>= <a href="#ResponseApcData">APC Data</a></td></tr>
+        <tr><td>4</td><td>= <a href="#ResponseAck">ACK</a></td></tr>
+        <tr><td>5</td><td>= <a href="#ResponseNak">NAK</a></td></tr>
+        <tr><td>0xFF</td><td>= <a href="#ResponseError">Error</a></td></tr>
+      </table>
+    </td>
       </tr>
       <tr>
-	<td>Length</td>
-	<td>Little Endian int32</td>
-	<td>Number of bytes in the body</td>
+    <td>Length</td>
+    <td>Little Endian int32</td>
+    <td>Number of bytes in the body</td>
       </tr>
     </table>
     <h3 id="ResponseXML">XML Body</h3>
@@ -195,14 +195,14 @@
     <p/>
     <table>
       <tr>
-	<th><span class="white">Name</span></th>
-	<th><span class="white">Type</span></th>
-	<th><span class="white">Description</span></th>
+    <th><span class="white">Name</span></th>
+    <th><span class="white">Type</span></th>
+    <th><span class="white">Description</span></th>
       </tr>
       <tr>
-	<td>version</td>
-	<td>Integer</td>
-	<td><span class="circle">240</span></td>
+    <td>version</td>
+    <td>Integer</td>
+    <td><span class="circle">240</span></td>
       </tr>
     </table>
     <p><b>target</b></p>
@@ -210,29 +210,29 @@
     <p/>
     <table>
       <tr>
-	<th><span class="white">Name</span></th>
-	<th><span class="white">Type</span></th>
-	<th><span class="white">Description</span></th>
+    <th><span class="white">Name</span></th>
+    <th><span class="white">Type</span></th>
+    <th><span class="white">Description</span></th>
       </tr>
       <tr>
-	<td>name</td>
-	<td>String</td>
-	<td>The name of the energy capture device</td>
+    <td>name</td>
+    <td>String</td>
+    <td>The name of the energy capture device</td>
       </tr>
       <tr>
-	<td>sample_rate</td>
-	<td>Integer</td>
-	<td>Number of samples collected per second</td>
+    <td>sample_rate</td>
+    <td>Integer</td>
+    <td>Number of samples collected per second</td>
       </tr>
       <tr>
-	<td>sources</td>
-	<td>Integer</td>
-	<td>Number of counters collected per sample</td>
+    <td>sources</td>
+    <td>Integer</td>
+    <td>Number of counters collected per sample</td>
       </tr>
       <tr>
-	<td>size</td>
-	<td>Integer</td>
-	<td>Number of bytes per sample source, one of 1, 2 or 4.</td>
+    <td>size</td>
+    <td>Integer</td>
+    <td>Number of bytes per sample source, one of 1, 2 or 4.</td>
       </tr>
     </table>
     <p><b>counters</b></p>
@@ -242,29 +242,29 @@
     <p/>
     <table>
       <tr>
-	<th><span class="white">Name</span></th>
-	<th><span class="white">Type</span></th>
-	<th><span class="white">Description</span></th>
+    <th><span class="white">Name</span></th>
+    <th><span class="white">Type</span></th>
+    <th><span class="white">Description</span></th>
       </tr>
       <tr>
-	<td>source</td>
-	<td>Integer</td>
-	<td>Order of this counter in the APC data</td>
+    <td>source</td>
+    <td>Integer</td>
+    <td>Order of this counter in the APC data</td>
       </tr>
       <tr>
-	<td>channel</td>
-	<td>Integer</td>
-	<td>Channel this counter corresponds to</td>
+    <td>channel</td>
+    <td>Integer</td>
+    <td>Channel this counter corresponds to</td>
       </tr>
       <tr>
-	<td>type</td>
-	<td>String</td>
-	<td>One of Power, Voltage or Current</td>
+    <td>type</td>
+    <td>String</td>
+    <td>One of Power, Voltage or Current</td>
       </tr>
       <tr>
-	<td>resistance</td>
-	<td>Integer</td>
-	<td>The resistance that corresponds to the channel</td>
+    <td>resistance</td>
+    <td>Integer</td>
+    <td>The resistance that corresponds to the channel</td>
       </tr>
     </table>
     <p>Example:</p>

@@ -1,8 +1,8 @@
 ## Purpose
 
-Instructions on setting up the ARM Energy Probe or National Instruments DAQ and running caiman.
+Instructions on setting up the Arm Energy Probe or National Instruments DAQ and running caiman.
 
-## ARM Energy Probe
+## Arm Energy Probe
 
 LEDs
 - No LED: The firmware needs to be installed

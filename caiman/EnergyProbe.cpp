@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ARM Limited 2011-2016. All rights reserved.
+ * Copyright (C) Arm Limited 2011-2016. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@
 #define tHANDLE                 pthread_t
 #endif
 
-// This is a compatibility version between caiman and the ARM Energy Probe
+// This is a compatibility version between caiman and the Arm Energy Probe
 #define ENERGY_PROBE_VERSION 20110803
 
 #define DYNAMIC_LINK_UDEV 1
@@ -383,7 +383,7 @@ void EnergyProbe::prepareChannels()
     // Energy Probe supports fewer channels than are permitted in configuration
     // Check user hasn't over-configured.
     if (gSessionData.mMaxEnabledChannel >= MAX_EPROBE_CHANNELS) {
-        logg.logError("Incorrect configuration: channel %d is configured, but ARM Energy Probe supports ch0-ch%d.",
+        logg.logError("Incorrect configuration: channel %d is configured, but Arm Energy Probe supports ch0-ch%d.",
                 gSessionData.mMaxEnabledChannel, MAX_EPROBE_CHANNELS-1);
         handleException();
     }

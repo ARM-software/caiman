@@ -1,4 +1,4 @@
-# Copyright (C) ARM Limited 2010-2016. All rights reserved.
+# Copyright (C) Arm Limited 2010-2016. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ include_directories(${PROJECT_SOURCE_DIR})
 
 if (NOT SUPPORT_UDEV)
     set(SUPPORT_UDEV 1 CACHE STRING
-        "Enable this to support auto-detection of the ARM Energy Probe on Linux. Requires udev support. If your Linux platform does not support udev, such as Red Hat 5, disable this option.")
+        "Enable this to support auto-detection of the Arm Energy Probe on Linux. Requires udev support. If your Linux platform does not support udev, such as Red Hat 5, disable this option.")
 endif(NOT SUPPORT_UDEV)
 if (NOT SUPPORT_DAQ)
     set(SUPPORT_DAQ ${PB_TARGETING_WINDOWS} CACHE STRING
