@@ -175,7 +175,7 @@ static void* stopThread(void* pVoid)
                         gQuit = true;
                     }
                     else {
-                        // Ping is used to make sure gator is alive and requires an ACK as the response
+                        // Ping is used to make sure caiman is alive and requires an ACK as the response
                         logg.logMessage("Ping command received.");
                         writeData(NULL, 0, RESPONSE_ACK);
                     }
@@ -358,12 +358,12 @@ static struct cmdline_t parseCommandLine(int argc, char** argv)
         const int minorVersion = (CAIMAN_VERSION / 10) % 10;
         const int revisionVersion = CAIMAN_VERSION % 10;
         if (revisionVersion == 0) {
-            snprintf(version_string, sizeof(version_string), "Streamline gatord version %d (Streamline v%d.%d)",
+            snprintf(version_string, sizeof(version_string), "Streamline caiman version %d (Streamline v%d.%d)",
             CAIMAN_VERSION,
                      majorVersion, minorVersion);
         }
         else {
-            snprintf(version_string, sizeof(version_string), "Streamline gatord version %d (Streamline v%d.%d.%d)",
+            snprintf(version_string, sizeof(version_string), "Streamline caiman version %d (Streamline v%d.%d.%d)",
             CAIMAN_VERSION,
                      majorVersion, minorVersion, revisionVersion);
         }
