@@ -24,13 +24,13 @@ The above can be repeated for further parings ex: AI2 and AI3.
 
 Auto-detect is not available with the NI-DAQmx Base drivers, so the device name (usually 'Dev1') must be supplied and can be determined from the National Instrument's List Devices utility. Also, with the Ni-DAQmx Base drivers, it takes a while to initialize the NI-DAQ, so power data for the first 3-8 seconds will not be captured.
 
-As NI only distributes 32 bit versions of their libraries, only the 32 bit version of caiman will work with the DAQ, even on 64 bit platforms. A Windows 64-bit install of DS-5 will contain a 32 bit version of caiman.
+As NI only distributes 32 bit versions of their libraries, only the 32 bit version of caiman will work with the DAQ, even on 64 bit platforms. A Windows 64-bit install of Arm Streamline will contain a 32 bit version of caiman.
 
 A NI-DAQ enabled version of caiman must be built from source on Linux. To build a NI-DAQ enabled version of caiman on Linux, edit `CMakeLists.txt` and set `SUPPORT_DAQ` to 1, set `NI_RUNTIME_LINK` to 0 and verify the NI-DAQ install paths within `CMakeLists.txt`.
 
 ## Debugging
 
-If you're having problems running caiman from Streamline, run it on the command line in local mode, ex: `/usr/local/DS-5/bin/caiman -l -r 0:20`. You may see additional information to assist with debugging or if no messages are printed after a few seconds you can kill caiman. If everything is OK the `0000000000` file will be non-empty.
+If you're having problems running caiman from Streamline, run it on the command line in local mode, ex: `/usr/local/Arm_ds/bin/caiman -l -r 0:20`. You may see additional information to assist with debugging or if no messages are printed after a few seconds you can kill caiman. If everything is OK the `0000000000` file will be non-empty.
 
 ## Building
 
