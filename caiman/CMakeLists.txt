@@ -16,7 +16,8 @@ cmake_minimum_required(VERSION 2.6)
 project(energy_probe)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
-include(pb_config)
+set(PB_TARGETING_UNIX ${UNIX})
+set(PB_TARGETING_WINDOWS ${WIN32})
 include_directories(${PROJECT_SOURCE_DIR})
 
 if (NOT SUPPORT_UDEV)
