@@ -1,5 +1,5 @@
 /**
- * Copyright (C) Arm Limited 2011-2016. All rights reserved.
+ * Copyright (C) 2011-2020 by Arm Limited. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
