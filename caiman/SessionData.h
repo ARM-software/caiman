@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2020 by Arm Limited. All rights reserved.
+ * Copyright (C) 2011-2021 by Arm Limited. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 
 // This is an informational version only; no compatibility is performed based on this value
 //development version is of format YYYYMMDD
-#define CAIMAN_VERSION 750
+#define CAIMAN_VERSION 760
 // Differentiates development versions (timestamp) from release versions
 #define PROTOCOL_DEV 10000000
 
