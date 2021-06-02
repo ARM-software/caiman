@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2020 by Arm Limited. All rights reserved.
+ * Copyright (C) 2011-2021 by Arm Limited. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -353,24 +353,25 @@ static struct cmdline_t parseCommandLine(int argc, char** argv)
     cmdline.isdaq = false;
     cmdline.local = false;
 
-    if (CAIMAN_VERSION < PROTOCOL_DEV) {
-        const int majorVersion = CAIMAN_VERSION / 100;
-        const int minorVersion = (CAIMAN_VERSION / 10) % 10;
-        const int revisionVersion = CAIMAN_VERSION % 10;
-        if (revisionVersion == 0) {
-            snprintf(version_string, sizeof(version_string), "Streamline caiman version %d (Streamline v%d.%d)",
-            CAIMAN_VERSION,
-                     majorVersion, minorVersion);
-        }
-        else {
-            snprintf(version_string, sizeof(version_string), "Streamline caiman version %d (Streamline v%d.%d.%d)",
-            CAIMAN_VERSION,
-                     majorVersion, minorVersion, revisionVersion);
-        }
+    {
+        const int baseProtocolVersion = (CAIMAN_VERSION >= 0 ? CAIMAN_VERSION : -(CAIMAN_VERSION % CAIMAN_VERSION_DEV_MULTIPLIER));
+        const int protocolDevTag = (CAIMAN_VERSION >= 0 ? 0 : -(CAIMAN_VERSION / CAIMAN_VERSION_DEV_MULTIPLIER));
+        const int majorVersion = baseProtocolVersion / 100;
+        const int minorVersion = (baseProtocolVersion / 10) % 10;
+        const int revisionVersion = baseProtocolVersion % 10;
+        const char * formatString = (CAIMAN_VERSION >= 0 ? (revisionVersion == 0 ? "Streamline caiman version %d (Streamline v%d.%d)"
+                                                                                 : "Streamline caiman version %d (Streamline v%d.%d.%d)")
+                                                         : "Streamline caiman development version %d (Streamline v%d.%d.%d), tag %d");
+        snprintf(version_string,
+             sizeof(version_string),
+             formatString,
+             CAIMAN_VERSION,
+             majorVersion,
+             minorVersion,
+             revisionVersion,
+             protocolDevTag);
     }
-    else {
-        snprintf(version_string, sizeof(version_string) - 1, "Streamline caiman development version %d", CAIMAN_VERSION);
-    }
+
     // Verify version_string is null terminated as snprintf isn't guaranteed to do so
     version_string[sizeof(version_string) - 1] = '\0';
     for (int i = 1; i < argc; i++) {

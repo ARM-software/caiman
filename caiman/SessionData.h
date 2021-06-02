@@ -18,12 +18,7 @@
 #define SESSION_DATA_H
 
 #include "Config.h"
-
-// This is an informational version only; no compatibility is performed based on this value
-//development version is of format YYYYMMDD
-#define CAIMAN_VERSION 760
-// Differentiates development versions (timestamp) from release versions
-#define PROTOCOL_DEV 10000000
+#include "ProtocolVersion.h"
 
 #define MAX_EPROBE_CHANNELS     3
 #define MAX_DAQ_CHANNELS        40  // A caiman 'channel' includes V+I
