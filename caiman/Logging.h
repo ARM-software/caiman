@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2020 by Arm Limited. All rights reserved.
+ * Copyright (C) 2010-2021 by Arm Limited. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +71,6 @@ private:
 
 extern Logging logg;
 
-extern void handleException();
+[[noreturn]] extern void handleException();
 
 #endif //__LOGGING_H__

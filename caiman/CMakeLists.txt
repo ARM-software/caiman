@@ -1,4 +1,4 @@
-# Copyright (C) 2010-2020 by Arm Limited. All rights reserved.
+# Copyright (C) 2010-2021 by Arm Limited. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,8 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cmake_minimum_required(VERSION 2.6)
-project(energy_probe)
+cmake_minimum_required(VERSION 3.6.3 FATAL_ERROR)
+
+project(energy_probe C CXX)
+
+####
+#   CTS requires C++11
+####
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+####
+#   Generate compile_commands.json for clang-tidy et al
+####
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Configuration options
+option(CLANG_TIDY_FIX       "Enable --fix with clang-tidy"  OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
 set(PB_TARGETING_UNIX ${UNIX})
@@ -70,10 +85,6 @@ else() # windows
     endif()
 endif()
 
-add_executable(caiman
-    ${src}
-)
-
 if (${SUPPORT_DAQ})
     add_definitions("-DSUPPORT_DAQ")
     # DAQ only works in 32-bit mode on Linux
@@ -118,6 +129,46 @@ if (${SUPPORT_DAQ})
     endif()
 endif()
 
+####
+#   Find various optional tools
+####
+find_file(CLANG_FORMAT NAMES "clang-format${CMAKE_EXECUTABLE_SUFFIX}"
+                       NO_CMAKE_FIND_ROOT_PATH)
+find_file(CLANG_TIDY NAMES "clang-tidy${CMAKE_EXECUTABLE_SUFFIX}"
+                     NO_CMAKE_FIND_ROOT_PATH)
+
+file(GLOB_RECURSE ALL_SRC_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+
+####
+#   Add a custom targets for running clang-format and clang tidy
+####
+if(EXISTS ${CLANG_FORMAT})
+    add_custom_target(clang-format
+                      COMMAND ${CLANG_FORMAT} -i ${ALL_SRC_FILES}
+                      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                      SOURCES ${ALL_SRC_FILES}
+                      COMMENT "Run clang-format on the sources")
+endif()
+
+if(EXISTS ${CLANG_TIDY})
+    ### CMAKE_xxx_CLANG_TIDY need to be before the ADD_EXECUTABLE
+    option(ENABLE_CLANG_TIDY_DURING_BUILD   "Compile and tidy at the same time" OFF)
+    if(ENABLE_CLANG_TIDY_DURING_BUILD)
+        SET(CMAKE_C_CLANG_TIDY      ${CLANG_TIDY} -p ${CMAKE_BINARY_DIR})
+        SET(CMAKE_CXX_CLANG_TIDY    ${CLANG_TIDY} -p ${CMAKE_BINARY_DIR})
+    endif()
+    add_custom_target(clang-tidy
+                      COMMAND ${CLANG_TIDY} -p ${CMAKE_BINARY_DIR} $<$<BOOL:${CLANG_TIDY_FIX}>:--fix> ${ALL_SRC_FILES}
+                      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                      SOURCES ${ALL_SRC_FILES}
+                      COMMENT "Run clang-tidy on the sources")
+endif()
+
+add_executable(caiman
+    ${src}
+)
 
 if(${PB_TARGETING_WINDOWS})
     target_link_libraries(caiman

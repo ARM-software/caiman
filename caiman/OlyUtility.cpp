@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010-2020 by Arm Limited. All rights reserved.
+ * Copyright (C) 2010-2021 by Arm Limited. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,10 +39,10 @@ bool stringToBool(const char* string, bool defValue)
     }
 
     strncpy(value, string, sizeof(value));
+    value[sizeof(value) - 1] = 0; // strncpy does not guarantee a null-terminated string
     if (value[0] == 0) {
         return defValue;
     }
-    value[sizeof(value) - 1] = 0; // strncpy does not guarantee a null-terminated string
 
     // Convert to lowercase
     int i = 0;

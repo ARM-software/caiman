@@ -123,7 +123,7 @@ static void writeData(const char* data, uint32_t length, int type)
     sock->send((const char*) data, length);
 }
 
-void handleException()
+[[noreturn]] void handleException()
 {
     static int numExceptions = 0;
     if (numExceptions++ > 0) {
