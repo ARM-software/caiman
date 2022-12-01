@@ -27,6 +27,32 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 ####
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+####
+#   When ccache basdir is set, remap paths to allow result sharing between builds
+####
+IF(DEFINED ENV{CCACHE_BASEDIR})
+    IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        IF("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "8.0.0")
+            SET(CCACHE_PATH_MAP_OPT "-fdebug-prefix-map=$ENV{CCACHE_BASEDIR}=.")
+        ELSE()
+            SET(CCACHE_PATH_MAP_OPT "-ffile-prefix-map=$ENV{CCACHE_BASEDIR}=.")
+        ENDIF()
+    ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        IF("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "10.0.0")
+            SET(CCACHE_PATH_MAP_OPT "-fdebug-prefix-map=$ENV{CCACHE_BASEDIR}=.")
+        ELSE()
+            SET(CCACHE_PATH_MAP_OPT "-ffile-prefix-map=$ENV{CCACHE_BASEDIR}=.")
+        ENDIF()
+    ELSE()
+        SET(CCACHE_PATH_MAP_OPT "")
+    ENDIF()
+
+    MESSAGE(STATUS "CCACHE_PATH_MAP_OPT = ${CCACHE_PATH_MAP_OPT}")
+
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CCACHE_PATH_MAP_OPT}")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CCACHE_PATH_MAP_OPT}")
+ENDIF()
+
 # Configuration options
 option(CLANG_TIDY_FIX       "Enable --fix with clang-tidy"  OFF)
 
