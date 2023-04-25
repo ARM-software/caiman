@@ -3,8 +3,8 @@
 
 /* Define the product release version / protocol version */
 
-// Protocol version Streamline v8.4
-#define CAIMAN_VERSION 840
+// Protocol version Streamline v8.5
+#define CAIMAN_VERSION 850
 // Differentiates development versions from release code
 #define CAIMAN_VERSION_DEV_MULTIPLIER 100000
 
